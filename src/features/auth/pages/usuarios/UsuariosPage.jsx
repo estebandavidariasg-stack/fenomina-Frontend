@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../../../../store/authStore';
-import { Search, ChevronDown } from 'lucide-react';
+import { Search, ChevronDown, UserRound } from 'lucide-react';
 import { useUsuarios } from '../../hooks/useUsuarios';
 import { useState, useRef, useEffect } from 'react';
 import { useAccionesUsuario } from '../../hooks/useAccionesUsuario';
@@ -56,7 +56,7 @@ export default function UsuariosPage() {
       {/* ENCABEZADO — título + perfil alineados */}
       <div style={styles.encabezado}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <img src={logoFE} alt="" style={{ width: '24px', height: '24px' }} />
+          <UserRound size={22} color="#0B662A" />
           <div>
             <h1 style={styles.titulo}>Usuarios</h1>
             <p style={styles.subtitulo}>Gestiona los usuarios del sistema</p>
@@ -255,10 +255,10 @@ const styles = {
     fontWeight: '400', cursor: 'pointer', fontFamily: 'Nunito, sans-serif',
   },
   tabs: { display: 'flex', gap: '24px', backgroundColor: '#ffffff', padding: '0 24px', 
-    borderRadius: '10px', boxShadow: '0 1px 3px rgba(0,0,0,0.06)', 
+    borderRadius: '10px', boxShadow: '0 1px 3px rgba(0,0,0,0.06)',  minHeight: '52px', alignItems: 'center',
   },
   tab: {
-    background: 'none', border: 'none', padding: '8px 0',
+    background: 'none', border: 'none', padding: '16px 0',
     fontSize: '13px', cursor: 'pointer', fontFamily: 'Nunito, sans-serif',
   },
   tablaWrapper: {
