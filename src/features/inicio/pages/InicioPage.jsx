@@ -116,12 +116,12 @@ const styles = {
   heroTitulo: { fontSize: '28px', fontWeight: '800', color: '#272525', marginBottom: '16px', lineHeight: 1.3 },
   heroDesc: { fontSize: '14px', color: '#555', lineHeight: 1.7 },
   heroImagen: { flex: 1, display: 'flex', justifyContent: 'center' },
-  imgPrincipal: { maxWidth: '100%', maxHeight: '250px', objectFit: 'contain' },
+  imgPrincipal: { maxWidth: '100%', maxHeight: '220px', objectFit: 'contain' },
   serviciosHeader: {
     display: 'flex', alignItems: 'flex-start', gap: '20px',
   },
   serviciosLabel: {
-    backgroundColor: '#268245', color: '#ffffff',
+    backgroundColor: '#034123', color: '#ffffff',
     padding: '8px 20px', borderRadius: '6px', fontSize: '16px',
     fontWeight: '700', whiteSpace: 'nowrap', fontFamily: 'Nunito, sans-serif',
     },
@@ -138,9 +138,4 @@ const styles = {
     display: 'flex', justifyContent: 'space-between', alignItems: 'center',
     marginBottom: '4px',
   },
-  bienvenidaTexto: { fontSize: '16px', fontWeight: '800', color: '#272525' },
-  fecha: { fontSize: '12px', color: '#A3A3A3', marginTop: '2px' },
-  userInfo: { display: 'flex', alignItems: 'center', gap: '10px' },
-  userName: { fontSize: '13px', fontWeight: '700', color: '#272525', lineHeight: 1.2 },
-  userCargo: { fontSize: '11px', color: '#A3A3A3' },
 };
