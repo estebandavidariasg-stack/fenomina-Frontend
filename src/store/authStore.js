@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { detenerRefreshAutomatico } from '../utils/tokenRefresh';
 
 export const useAuthStore = create(
   persist(
@@ -13,9 +14,10 @@ export const useAuthStore = create(
 
       setUsuario: (usuario) => set({ usuario }),
 
-      logout: () =>
-        set({ accessToken: null, refreshToken: null, usuario: null }),
-    }),
+      logout: () => {
+        detenerRefreshAutomatico();  
+        set({ accessToken: null, refreshToken: null, usuario: null });
+      }}),
     {
       name: 'auth-storage',
       partialize: (state) => ({

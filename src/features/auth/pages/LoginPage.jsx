@@ -5,6 +5,7 @@ import imagenLogin from '../../../assets/Imagenautenticacion.png';
 import logoNombre from '../../../assets/logo_nombre.png';
 import { useAuthStore } from '../../../store/authStore';
 import axiosInstance from '../../../api/axiosInstance';
+import { iniciarRefreshAutomatico } from '../../../utils/tokenRefresh';
 
 export default function LoginPage() {
   const navigate = useNavigate();
@@ -34,6 +35,9 @@ export default function LoginPage() {
 
       setTokens(data.accessToken, data.refreshToken, data.expiresIn);
       setUsuario(data.usuario);
+
+      iniciarRefreshAutomatico();
+
       navigate('/inicio');
     } catch (err) {
         const errorCode = err.response?.data?.errorCode;
@@ -47,6 +51,8 @@ export default function LoginPage() {
           setError('Usuario o contraseña incorrectos.');
         } else if (errorCode === 'AUTH_002') {
           setError('Usuario no encontrado.');
+        } else if (!err.response) {
+          setError('No se pudo conectar con el servidor. Verifica tu conexión.');
         } else {
           setError('Ocurrió un error. Intenta de nuevo.');
         }

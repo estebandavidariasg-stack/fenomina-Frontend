@@ -1,15 +1,29 @@
+// axiosInstance.js
 import axios from 'axios';
 import { useAuthStore } from '../store/authStore';
 
 const axiosInstance = axios.create({
-  baseURL: 'http://localhost:8081', //URL de AuthService (¡TEMPORAL!) una vez que se implemente APIGateway (Backend) cambiar a 8080
+  baseURL: import.meta.env.VITE_API_URL,
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json',
   },
 });
 
-// REQUEST: adjunta el access token a cada petición
+let isRefreshing = false;  // ← AGREGAR
+let failedQueue = [];      // ← AGREGAR
+
+const processQueue = (error, token = null) => {
+  failedQueue.forEach(prom => {
+    if (error) {
+      prom.reject(error);
+    } else {
+      prom.resolve(token);
+    }
+  });
+  failedQueue = [];
+};
+
 axiosInstance.interceptors.request.use(
   (config) => {
     const token = useAuthStore.getState().accessToken;
@@ -21,7 +35,6 @@ axiosInstance.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// si el token expiró, intenta renovarlo automaticamente
 axiosInstance.interceptors.response.use(
   (response) => response,
   async (error) => {
@@ -31,23 +44,43 @@ axiosInstance.interceptors.response.use(
                        originalRequest.url?.includes('/auth/refresh');
 
     if (error.response?.status === 401 && !originalRequest._retry && !esRutaAuth) {
+      
+      if (isRefreshing) {
+        // Si ya hay un refresh en progreso, encolar este request
+        return new Promise((resolve, reject) => {
+          failedQueue.push({ resolve, reject });
+        }).then(token => {
+          originalRequest.headers.Authorization = `Bearer ${token}`;
+          return axiosInstance(originalRequest);
+        }).catch(err => {
+          return Promise.reject(err);
+        });
+      }
+
       originalRequest._retry = true;
+      isRefreshing = true;
 
       try {
         const refreshToken = useAuthStore.getState().refreshToken;
 
-        const { data } = await axios.post('http://localhost:8081/auth/refresh', {
+        const { data } = await axios.post(`${import.meta.env.VITE_API_URL}/auth/refresh`, {
           refreshToken,
         });
 
-        useAuthStore.getState().setTokens(data.accessToken, data.refreshToken);
+        useAuthStore.getState().setTokens(data.accessToken, data.refreshToken, data.expiresIn);
+        
+        processQueue(null, data.accessToken);
+        
         originalRequest.headers.Authorization = `Bearer ${data.accessToken}`;
-
         return axiosInstance(originalRequest);
+        
       } catch (refreshError) {
+        processQueue(refreshError, null);
         useAuthStore.getState().logout();
         window.location.href = '/login';
         return Promise.reject(refreshError);
+      } finally {
+        isRefreshing = false;
       }
     }
 
