@@ -1,9 +1,18 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { useAuthStore } from '../store/authStore';
 import LoginPage from '../features/auth/pages/LoginPage';
 import UsuariosPage from '../features/auth/pages/usuarios/UsuariosPage';
 import CrearUsuarioPage from '../features/auth/pages/usuarios/CrearUsuarioPage';
+import VerUsuarioPage from '../features/auth/pages/usuarios/VerUsuarioPage';
+import EditarUsuarioPage from '../features/auth/pages/usuarios/EditarUsuarioPage';
+import InicioPage from '../features/inicio/pages/InicioPage';
 import ProtectedRoute from './ProtectedRoute';
 import MainLayout from '../layouts/MainLayout';
+
+function RutaRaiz() {
+  const { accessToken } = useAuthStore();
+  return accessToken ? <Navigate to="/inicio" replace /> : <Navigate to="/login" replace />;
+}
 import EmpresasPage from '../features/auth/pages/empresas/EmpresasPage';
 import EmpresasModuloOpUno from '../features/auth/pages/empresas/EmpresasModuloOpUno';
 import EmpresasModuloOpDos from '../features/auth/pages/empresas/EmpresasModuloOpDos';
@@ -23,21 +32,32 @@ import GenerarReportePage from '../features/auth/pages/empresas/nominas/GenerarR
 import DesprendiblesPage from '../features/auth/pages/empresas/nominas/DesprendiblesPage';
 
 
-
-
-
-
-
 export default function AppRouter() {
   return (
     <BrowserRouter>
       <Routes>
+        <Route path="/" element={<RutaRaiz />} />
         {/* Rutas públicas */}
         <Route path="/login" element={<LoginPage />} />
+
+        {/* Rutas protegidas — todos los roles */}
+        <Route element={<ProtectedRoute rolesPermitidos={['SUPER_ADMIN', 'RRHH', 'AUDITOR', 'CLIENTE_EMPRESA']} />}>
 
         {/* Rutas protegidas */}
         <Route element={<ProtectedRoute rolesPermitidos={['SUPER_ADMIN']} />}>
           <Route element={<MainLayout />}>
+            <Route path="/inicio" element={<InicioPage />} />
+
+            {/* Solo SUPER_ADMIN */}
+            <Route element={<ProtectedRoute rolesPermitidos={['SUPER_ADMIN']} />}>
+              <Route path="/usuarios" element={<UsuariosPage />} />
+              <Route path="/usuarios/crear" element={<CrearUsuarioPage />} />
+              <Route path="/usuarios/:id" element={<VerUsuarioPage />} />
+              <Route path="/usuarios/:id/editar" element={<EditarUsuarioPage />} />
+            </Route>
+          </Route>
+        </Route>
+
 
             {/* Usuarios */}
             <Route path="/usuarios" element={<UsuariosPage />} />

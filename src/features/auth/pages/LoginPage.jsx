@@ -5,6 +5,7 @@ import imagenLogin from '../../../assets/Imagenautenticacion.png';
 import logoNombre from '../../../assets/logo_nombre.png';
 import { useAuthStore } from '../../../store/authStore';
 import axiosInstance from '../../../api/axiosInstance';
+import { iniciarRefreshAutomatico } from '../../../utils/tokenRefresh';
 
 export default function LoginPage() {
   const navigate = useNavigate();
@@ -34,22 +35,28 @@ export default function LoginPage() {
 
       setTokens(data.accessToken, data.refreshToken, data.expiresIn);
       setUsuario(data.usuario);
-      navigate('/usuarios');
-    } catch (err) {
-      const errorCode = err.response?.data?.errorCode;
 
-      if (errorCode === 'AUTH_003') {
-        setError('Cuenta bloqueada por múltiples intentos fallidos. Contacta al administrador.');
-      } else if (errorCode === 'AUTH_009') {
-        setError('Tu cuenta está inactiva. Contacta al administrador.');
-      } else if (errorCode === 'AUTH_001' || status === 401) {
-        setError('Usuario o contraseña incorrectos.');
-      } else if (errorCode === 'AUTH_002') {
-        setError('Usuario no encontrado.');
-      }else {
-        setError('Ocurrió un error. Intenta de nuevo.');
-      }
-    } finally {
+      iniciarRefreshAutomatico();
+
+      navigate('/inicio');
+    } catch (err) {
+        const errorCode = err.response?.data?.errorCode;
+        const status = err.response?.status;
+
+        if (errorCode === 'AUTH_003') {
+          setError('Cuenta bloqueada por múltiples intentos fallidos. Contacta al administrador.');
+        } else if (errorCode === 'AUTH_009') {
+          setError('Tu cuenta está inactiva. Contacta al administrador.');
+        } else if (errorCode === 'AUTH_001' || status === 401) {
+          setError('Usuario o contraseña incorrectos.');
+        } else if (errorCode === 'AUTH_002') {
+          setError('Usuario no encontrado.');
+        } else if (!err.response) {
+          setError('No se pudo conectar con el servidor. Verifica tu conexión.');
+        } else {
+          setError('Ocurrió un error. Intenta de nuevo.');
+        }
+      } finally {
       setCargando(false);
     }
   };
