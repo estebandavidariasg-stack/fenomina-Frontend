@@ -10,8 +10,8 @@ const axiosInstance = axios.create({
   },
 });
 
-let isRefreshing = false;  // ← AGREGAR
-let failedQueue = [];      // ← AGREGAR
+let isRefreshing = false;  
+let failedQueue = [];      
 
 const processQueue = (error, token = null) => {
   failedQueue.forEach(prom => {
