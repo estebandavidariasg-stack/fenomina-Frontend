@@ -1,4 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import empleadosService from '../../../../../services/empleadosService';
+import contratoConceptoService from '../../../../../services/contratoConceptoService';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAuthStore } from "../../../../../store/authStore";
 import { Users, ChevronDown, ChevronLeft, ChevronRight, Plus, Trash2, Calendar } from 'lucide-react';
@@ -115,18 +117,74 @@ export default function EditarEmpleadoPage() {
   const [hoverGuardar, setHoverGuardar]   = useState(false);
   const [hoverRegresar, setHoverRegresar] = useState(false);  
 
-  // MOCK - reemplazar con datos reales del backend
+  const [cargando, setCargando] = useState(true);
+  const [conceptos,          setConceptos]          = useState([{ contratoConceptId: null, conceptoNominaId: '', valor: '' }]);
+  const [conceptosOriginales, setConceptosOriginales] = useState([]);
+
   const [form, setForm] = useState({
-    tipoDocumento:    'CC', numeroDocumento:  '10758963', nombresEmpleado:  'Mario Andrés',
-    apellidosEmpleado:'Rodriguez Vanegas', direccion: 'Crra. 13 #4B-15', cargo: '',
-    tipoContrato:     '', jornada:          '', fechaIngreso:     '',
-    fechaFinContrato: '', tipoCotizante:    '', subtipoCotizante: '',
-    fechaRetiro:      '', salario:          '', auxTransporte:    '',
-    eps:              '', fondoPensiones:   '', arl:              '',
-    claseRiesgo:      '', fondoCesantias:   '', cajaCompensacion: '',
+    tipoDocumento: '', numeroDocumento: '', nombresEmpleado: '',
+    apellidosEmpleado: '', direccion: '', cargo: '',
+    tipoContrato: '', jornada: '', fechaIngreso: '',
+    fechaFinContrato: '', tipoCotizante: '', subtipoCotizante: '',
+    fechaRetiro: '', salario: '', auxTransporte: '',
+    eps: '', fondoPensiones: '', arl: '',
+    claseRiesgo: '', fondoCesantias: '', cajaCompensacion: '',
   });
 
-  const [conceptos, setConceptos] = useState([{ nombre: '', valor: '' }]);
+  useEffect(() => {
+    Promise.all([
+      empleadosService.getEmpleadoById(empleadoId),
+      empleadosService.getConceptosEmpleado(empleadoId),
+    ])
+      .then(([{ data: emp }, { data: conc }]) => {
+        // Convertir fecha ISO "YYYY-MM-DD" → "DD/MM/YYYY" para el CalendarioInput
+        const toDisplay = (fecha) => {
+          if (!fecha) return '';
+          const [y, m, d] = fecha.split('-');
+          return `${d}/${m}/${y}`;
+        };
+
+        setForm({
+          tipoDocumento:     emp.tipoDocumento,
+          numeroDocumento:   emp.documentoEmp,
+          nombresEmpleado:   emp.nombresEmp,
+          apellidosEmpleado: emp.apellidosEmp,
+          direccion:         emp.direccionEmp     ?? '',
+          cargo:             emp.cargoEmp         ?? '',
+          tipoContrato:      emp.tipoContratoEmp?.toLowerCase()  ?? '',
+          jornada:           emp.jornadaTrabajoEmp?.toLowerCase() ?? '',
+          fechaIngreso:      toDisplay(emp.fechaIngresoEmp),
+          fechaFinContrato:  toDisplay(emp.fechaFinContrato),
+          tipoCotizante:     emp.tipoCotizante,
+          subtipoCotizante:  emp.subtipoCotizante,
+          fechaRetiro:       toDisplay(emp.fechaRetiroEmp),
+          salario:           emp.salarioBascMensual?.toString() ?? '',
+          auxTransporte:     emp.tieneAuxTransporte ? 'SI' : 'NO',
+          eps:               emp.nombreEps,
+          fondoPensiones:    emp.fondoPensionEmp,
+          arl:               emp.nombreArl,
+          claseRiesgo:       emp.claseRiesgo,
+          fondoCesantias:    emp.fondoCesantiasEmp,
+          cajaCompensacion:  emp.cajaCompensacion,
+        });
+
+        // Mapear conceptos del back al estado local
+        const conceptosMapeados = conc.length > 0
+          ? conc.map(c => ({
+              contratoConceptId: c.contratoConceptId,  // ID real del back
+              conceptoNominaId:  String(c.conceptoNominaId),
+              valor:             String(c.valorFijo ?? ''),
+            }))
+          : [{ contratoConceptId: null, conceptoNominaId: '', valor: '' }];
+
+        setConceptos(conceptosMapeados);
+        setConceptosOriginales(conceptosMapeados);
+      })
+      .catch(console.error)
+      .finally(() => setCargando(false));
+  }, [empleadoId]);
+
+  if (cargando) return <p>Cargando...</p>;
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -138,7 +196,7 @@ export default function EditarEmpleadoPage() {
     setErrores({ ...errores, [campo]: '' });
   };
 
-  const agregarConcepto  = () => setConceptos([...conceptos, { nombre: '', valor: '' }]);
+  const agregarConcepto = () => setConceptos([...conceptos, { contratoConceptId: null, conceptoNominaId: '', valor: '' }]);
   const eliminarConcepto = (i) => setConceptos(conceptos.filter((_, idx) => idx !== i));
   const handleConcepto   = (i, campo, valor) => { const n = [...conceptos]; n[i][campo] = valor; setConceptos(n); };
 
@@ -156,7 +214,91 @@ export default function EditarEmpleadoPage() {
   };
 
   const handleSubmit    = () => { if (!validar()) return; setConfirmar(true); };
-  const handleConfirmar = () => { setConfirmar(false); setModal('exito'); };
+  const handleConfirmar = async () => {
+    setConfirmar(false);
+
+    const toISO = (fecha) => {
+      if (!fecha) return null;
+      const [d, m, y] = fecha.split('/');
+      return `${y}-${m}-${d}`;
+    };
+
+    const empleadoDTO = {
+      tipoDocumento:      form.tipoDocumento,
+      documentoEmp:       form.numeroDocumento,
+      nombresEmp:         form.nombresEmpleado,
+      apellidosEmp:       form.apellidosEmpleado,
+      direccionEmp:       form.direccion,
+      tipoContratoEmp:    form.tipoContrato.toUpperCase(),
+      fechaIngresoEmp:    toISO(form.fechaIngreso),
+      fechaFinContrato:   toISO(form.fechaFinContrato),
+      cargoEmp:           form.cargo,
+      salarioBascMensual: parseFloat(form.salario),
+      claseRiesgo:        form.claseRiesgo,
+      tipoCotizante:      form.tipoCotizante,
+      subtipoCotizante:   form.subtipoCotizante,
+      nombreArl:          form.arl,
+      nombreEps:          form.eps,
+      fondoPensionEmp:    form.fondoPensiones,
+      cajaCompensacion:   form.cajaCompensacion,
+      fondoCesantiasEmp:  form.fondoCesantias,
+      jornadaTrabajoEmp:  form.jornada.toUpperCase(),
+    };
+
+    try {
+      // 1. Actualizar datos del empleado
+      await empleadosService.actualizarEmpleado(empleadoId, empleadoDTO);
+
+      // 2. Sincronizar conceptos
+      const conceptosValidos = conceptos.filter(c => c.conceptoNominaId && c.valor);
+
+      // Conceptos originales que ya no están en el formulario → soft delete
+      const idsActuales = new Set(
+        conceptosValidos
+          .filter(c => c.contratoConceptId)
+          .map(c => c.contratoConceptId)
+      );
+
+      const aEliminar = conceptosOriginales.filter(
+        orig => !idsActuales.has(orig.contratoConceptId)
+      );
+
+      // Conceptos con valor modificado → soft delete + recrear
+      const aActualizar = conceptosValidos.filter(c => {
+        if (!c.contratoConceptId) return false;
+        const orig = conceptosOriginales.find(o => o.contratoConceptId === c.contratoConceptId);
+        return orig && orig.valor !== c.valor;
+        });
+
+      // Conceptos nuevos (sin contratoConceptId)
+      const aCrear = conceptosValidos.filter(c => !c.contratoConceptId);
+
+      // Ejecutar soft deletes
+      await Promise.all([
+        ...aEliminar.map(c => contratoConceptoService.eliminarConcepto(c.contratoConceptId)),
+        ...aActualizar.map(c => contratoConceptoService.eliminarConcepto(c.contratoConceptId)),
+      ]);
+
+      // Crear los nuevos y los actualizados (con nuevo valor)
+      await Promise.all([
+        ...aCrear.map(c => contratoConceptoService.crearConcepto({
+          empleadoId:       Number(empleadoId),
+          conceptoNominaId: Number(c.conceptoNominaId),
+          valorFijo:        parseFloat(c.valor),
+        })),
+        ...aActualizar.map(c => contratoConceptoService.crearConcepto({
+          empleadoId:       Number(empleadoId),
+          conceptoNominaId: Number(c.conceptoNominaId),
+          valorFijo:        parseFloat(c.valor),
+        })),
+      ]);
+
+      setModal('exito');
+    } catch (err) {
+      setModal('error');
+      console.error(err.response?.data?.message ?? 'Error al actualizar');
+    }
+  };
 
   const inputStyle  = (c) => ({ ...styles.input,  border: errores[c] ? '1px solid #E53E3E' : '1px solid #D0D0D0' });
   const selectStyle = (c) => ({ ...styles.select, border: errores[c] ? '1px solid #E53E3E' : '1px solid #D0D0D0' });
@@ -415,7 +557,7 @@ export default function EditarEmpleadoPage() {
             <div style={{ ...styles.campo, flex: 1 }}>
               {i === 0 && <label style={styles.label}>Nombre concepto</label>}
               <div style={styles.selectWrapper}>
-                <select value={c.nombre} onChange={(e) => handleConcepto(i, 'nombre', e.target.value)} style={styles.select}>
+                <select value={c.conceptoNominaId} onChange={(e) => handleConcepto(i, 'conceptoNominaId', e.target.value)} style={styles.select}>
                   <option value="">Seleccionar opción</option>
                   <option value="beneficio">Beneficio o Extralegal</option>
                   <option value="bonificacion">Bonificaciones Habituales</option>

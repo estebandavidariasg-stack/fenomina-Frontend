@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useState } from 'react'; 
+import empleadosService from '../../../../../services/empleadosService';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAuthStore } from '../../../../../store/authStore';
-import { useEmpleados } from "../../../hooks/useEmpleados";
+import { useEmpleados } from '../../../hooks/useEmpleados';
 import { Users, Search, Eye, ChevronLeft } from 'lucide-react';
 import EstadoDropdown from '../../../../../components/EstadoDropdown';
 import ConfirmarCambiosModal from '../../../../../components/ConfirmarCambiosModal';
@@ -9,14 +10,15 @@ import MensajeModal from '../../../../../components/MensajeModal';
 
 export default function EmpleadosPage() {
   const navigate    = useNavigate();
-  const { id }      = useParams();
+  const { id } = useParams();
   const { usuario } = useAuthStore();
   const {
     empleados, total, totalPaginas, cargando,
     pagina, setPagina,
     busqueda, setBusqueda,
     tab, setTab,
-  } = useEmpleados();
+    recargar,
+  } = useEmpleados(id);
 
   const inicial = usuario?.nombresUsuario?.charAt(0).toUpperCase() ?? 'U';
   const nombre  = `${usuario?.nombresUsuario ?? ''} ${usuario?.apellidosUsuario ?? ''}`.trim();
@@ -38,10 +40,17 @@ export default function EmpleadosPage() {
     setModalEstado(true);
   };
 
-  const handleConfirmarEstado = () => {
-    setModalEstado(false);
-    setModal('exito');
-    console.log(`Cambiar empleado ${empleadoSeleccionado?.id} a ${nuevoEstado}`);
+  const handleConfirmarEstado = async () => {
+    try {
+      await empleadosService.cambiarEstado(empleadoSeleccionado.empleadoId, nuevoEstado);
+      setModalEstado(false);
+      setModal('exito');
+      recargar(); // refresca la tabla
+    } catch (err) {
+      setModalEstado(false);
+      setModal('error');
+      console.error(err.response?.data?.message ?? 'Error al cambiar estado');
+    }
   };
 
   return (
@@ -147,26 +156,26 @@ export default function EmpleadosPage() {
                 <tr><td colSpan={13} style={{ textAlign: 'center', padding: '20px', color: '#A3A3A3' }}>Sin resultados</td></tr>
               ) : (
                 empleados.map((emp, index) => (
-                  <tr key={emp.id} style={index % 2 === 0 ? styles.trPar : styles.trImpar}>
+                  <tr key={emp.empleadoId} style={index % 2 === 0 ? styles.trPar : styles.trImpar}>
                     <td style={styles.td}>{String(pagina * 10 + index + 1).padStart(2, '0')}</td>
-                    <td style={styles.td}>{emp.nombres}</td>
-                    <td style={styles.td}>{emp.apellidos}</td>
-                    <td style={styles.td}>{emp.fechaIngreso}</td>
-                    <td style={styles.td}>{emp.documento}</td>
-                    <td style={styles.td}>{emp.salario}</td>
-                    <td style={styles.td}>{emp.auxTransporte}</td>
-                    <td style={styles.td}>{emp.eps}</td>
-                    <td style={styles.td}>{emp.pension}</td>
-                    <td style={styles.td}>{emp.arl}</td>
-                    <td style={styles.td}>{emp.caja}</td>
+                    <td style={styles.td}>{emp.nombresEmp}</td>
+                    <td style={styles.td}>{emp.apellidosEmp}</td>
+                    <td style={styles.td}>{emp.fechaIngresoEmp}</td>
+                    <td style={styles.td}>{emp.documentoEmp}</td>
+                    <td style={styles.td}>{emp.salarioBascMensual}</td>
+                    <td style={styles.td}>{emp.tieneAuxTransporte ? 'SI' : 'NO'}</td>
+                    <td style={styles.td}>{emp.nombreEps}</td>
+                    <td style={styles.td}>{emp.fondoPensionEmp}</td>
+                    <td style={styles.td}>{emp.nombreArl}</td>
+                    <td style={styles.td}>{emp.cajaCompensacion}</td>
                     <td style={styles.td}>
                       <EstadoDropdown
-                        estadoActual={emp.estado}
+                        estadoActual={emp.estadoEmp}
                         onCambiar={(nuevoE) => handleCambiarEstado(emp, nuevoE)}
                       />
                     </td>
                     <td style={styles.td}>
-                      <button style={styles.btnVer} onClick={() => navigate(`/empresas/${id}/empleados/${emp.id}`)}>
+                      <button style={styles.btnVer} onClick={() => navigate(`/empresas/${id}/empleados/${emp.empleadoId}`)}>
                         <Eye size={16} color="#0B662A" />
                       </button>
                     </td>

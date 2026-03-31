@@ -3,13 +3,16 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { UserRound } from 'lucide-react';
 import axiosInstance from '../../../../api/axiosInstance';
 import { useAuthStore } from '../../../../store/authStore';
+import { useEmpresasLista } from '../../hooks/useEmpresasLista';
 
 const LABEL_ROL = {
   SUPER_ADMIN: 'Super Admin', RRHH: 'Recursos Humanos',
   AUDITOR: 'Auditor', CLIENTE_EMPRESA: 'Cliente Empresa',
 };
 
+
 export default function VerUsuarioPage() {
+  const { empresas } = useEmpresasLista();
   const { id } = useParams();
   const navigate = useNavigate();
   const { usuario: usuarioActual } = useAuthStore();
@@ -71,7 +74,14 @@ export default function VerUsuarioPage() {
           <Campo label="Rol" valor={LABEL_ROL[usuario.rolUsuario] || usuario.rolUsuario} />
         </div>
         <div style={{ ...styles.grid2, marginTop: '16px' }}>
-          <Campo label="ID Empresa" valor={usuario.fkIdEmpresa ?? 'Acceso a todas las empresas'} />
+          <Campo
+            label="Empresa"
+            valor={
+              usuario.fkIdEmpresa
+                ? (empresas.find(e => e.empresaId === usuario.fkIdEmpresa)?.nombreEmpresa ?? `Empresa ID: ${usuario.fkIdEmpresa}`)
+                : 'Acceso a todas las empresas'
+            }
+          />
           <Campo label="Fecha de registro" valor={formatearFecha(usuario.createdAt)} />
         </div>
         <div style={{ ...styles.grid2, marginTop: '16px' }}>

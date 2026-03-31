@@ -1,16 +1,27 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAuthStore } from '../../../../store/authStore';
-import { useEmpresas } from '../../hooks/useEmpresas';
 import { Building2, ChevronDown } from 'lucide-react';
+import empresasService from '../../../../services/empresasService';
+
 
 export default function InfoEmpresaPage() {
   const navigate    = useNavigate();
   const { id }      = useParams();
   const { usuario } = useAuthStore();
-  const { getEmpresaById } = useEmpresas();
 
-  const empresa = getEmpresaById(id);
+  const [empresa, setEmpresa] = useState(null);
+  const [cargando, setCargando] = useState(true);
+
+  useEffect(() => {
+    empresasService.getEmpresaById(id)
+      .then(({ data }) => setEmpresa(data))
+      .catch(() => setEmpresa(null))
+      .finally(() => setCargando(false));
+  }, [id]);
+
+  if (cargando) return <p>Cargando...</p>;
+  if (!empresa) return <p>Empresa no encontrada.</p>;
 
   const inicial = usuario?.nombresUsuario?.charAt(0).toUpperCase() ?? 'U';
   const nombre  = `${usuario?.nombresUsuario ?? ''} ${usuario?.apellidosUsuario ?? ''}`.trim();
@@ -49,7 +60,7 @@ export default function InfoEmpresaPage() {
         <div style={styles.fila3}>
           <div style={styles.campo}>
             <label style={styles.label}>NIT Empresa<span style={styles.req}>*</span></label>
-            <input readOnly value={empresa.nitEmpresa} style={styles.inputReadOnly} />
+            <input readOnly value={empresa.empresaNit} style={styles.inputReadOnly} />
           </div>
           <div style={styles.campo}>
             <label style={styles.label}>Razón Social<span style={styles.req}>*</span></label>
@@ -57,7 +68,7 @@ export default function InfoEmpresaPage() {
           </div>
           <div style={styles.campo}>
             <label style={styles.label}>Nombre Empresa<span style={styles.req}>*</span></label>
-            <input readOnly value={empresa.nombre} style={styles.inputReadOnly} />
+            <input readOnly value={empresa.nombreEmpresa} style={styles.inputReadOnly} />
           </div>
         </div>
       </div>
@@ -73,7 +84,7 @@ export default function InfoEmpresaPage() {
             y salud conforme a la Ley 1607 de 2012 (campo 33 del archivo tipo 1 de la PILA)<span style={styles.req}>*</span>
           </p>
           <div style={styles.selectWrapper}>
-            <select disabled value={empresa.ley1607} style={styles.selectReadOnly}>
+            <select disabled value={empresa.esExoneradaLey1607 ? 'SI' : 'NO'} style={styles.selectReadOnly}>
               <option value="SI">SI</option>
               <option value="NO">NO</option>
             </select>
@@ -87,7 +98,7 @@ export default function InfoEmpresaPage() {
           <div style={styles.logoBox}>
             <div style={styles.fotoCirculo}>
               {empresa.logo
-                ? <img src={empresa.logo} alt="logo" style={styles.fotoImg} />
+                ? <img src={`${import.meta.env.VITE_MASTER_API_URL}${empresa.logoEmpresaUrl}`} alt="logo" style={styles.fotoImg} />
                 : <Building2 size={32} color="#A3A3A3" />
               }
             </div>
@@ -113,7 +124,7 @@ export default function InfoEmpresaPage() {
           <div style={styles.campo}>
             <label style={styles.label}>Reportes de Nómina Empleados (Desprendibles)<span style={styles.req}>*</span></label>
             <div style={styles.selectWrapper}>
-              <select disabled value={empresa.reportesNomina} style={styles.selectReadOnly}>
+              <select disabled value={empresa.aplicaNomina ? 'SI' : 'NO'} style={styles.selectReadOnly}>
                 <option value="SI">SI</option>
                 <option value="NO">NO</option>
               </select>
@@ -123,7 +134,7 @@ export default function InfoEmpresaPage() {
           <div style={styles.campo}>
             <label style={styles.label}>Reportes de Primas Empleados (Desprendibles)<span style={styles.req}>*</span></label>
             <div style={styles.selectWrapper}>
-              <select disabled value={empresa.reportesPrimas} style={styles.selectReadOnly}>
+              <select disabled value={empresa.aplicaPrima ? 'SI' : 'NO'} style={styles.selectReadOnly}>
                 <option value="SI">SI</option>
                 <option value="NO">NO</option>
               </select>
@@ -133,7 +144,7 @@ export default function InfoEmpresaPage() {
           <div style={styles.campo}>
             <label style={styles.label}>Reportes de Cesantías e Intereses Empleados (Desprendibles)<span style={styles.req}>*</span></label>
             <div style={styles.selectWrapper}>
-              <select disabled value={empresa.reportesCesantias} style={styles.selectReadOnly}>
+              <select disabled value={empresa.aplicaCesantias ? 'SI' : 'NO'} style={styles.selectReadOnly}>
                 <option value="SI">SI</option>
                 <option value="NO">NO</option>
               </select>

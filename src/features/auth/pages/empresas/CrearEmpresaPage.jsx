@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../../../../store/authStore';
 import { Building2, Camera, ChevronDown } from 'lucide-react';
 import MensajeModal from '../../../../components/MensajeModal';
+import empresasService from '../../../../services/empresasService';
 
 export default function CrearEmpresaPage() {
   const navigate    = useNavigate();
@@ -57,11 +58,28 @@ export default function CrearEmpresaPage() {
     return Object.keys(nuevosErrores).length === 0;
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!validar()) return;
-    console.log('Form:', form);
-    console.log('Foto:', foto);
-    setModal('exito');
+
+    // Mapeo front -> DTO back
+    const empresaDTO = {
+      empresaNit:          form.nitEmpresa,
+      razonSocial:         form.razonSocial,
+      nombreEmpresa:       form.nombreEmpresa,
+      esExoneradaLey1607:  form.ley1607 === 'SI',
+      aplicaNomina:        form.reportesNomina    === 'SI',
+      aplicaPrima:         form.reportesPrimas    === 'SI',
+      aplicaCesantias:     form.reportesCesantias === 'SI',
+    };
+
+    try {
+      await empresasService.crearEmpresa(empresaDTO, foto);
+      setModal('exito');
+    } catch (err) {
+      const msg = err.response?.data?.message ?? 'Error al crear la empresa';
+      setModal('error');
+      console.error(msg);
+    }
   };
 
   return (
@@ -278,7 +296,13 @@ export default function CrearEmpresaPage() {
       </div>
 
       {/* Modal */}
-      <MensajeModal tipo={modal} onClose={() => setModal(null)} />
+      <MensajeModal
+        tipo={modal}
+        onClose={() => {
+          setModal(null);
+          if (modal === 'exito') navigate('/empresas');
+        }}
+      />
 
     </div>
   );

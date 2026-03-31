@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, UserRound, CheckCircle2, AlertTriangle } from 'lucide-react';
 import axiosInstance from '../../../../api/axiosInstance';
 import { useAuthStore } from '../../../../store/authStore';
+import { useEmpresasLista } from '../../hooks/useEmpresasLista';
 
 const ROLES = [
   { value: 'SUPER_ADMIN', label: 'Super Admin' },
@@ -18,6 +19,7 @@ const camposVacios = {
 };
 
 export default function CrearUsuarioPage() {
+  const { empresas, cargando: cargandoEmpresas } = useEmpresasLista();
   const navigate = useNavigate();
   const { usuario } = useAuthStore();
   const [form, setForm] = useState(camposVacios);
@@ -165,7 +167,30 @@ export default function CrearUsuarioPage() {
             </select>
             {errores.rolUsuario && <span style={styles.errorTexto}>{errores.rolUsuario}</span>}
           </div>
-          <Campo label="ID Empresa (opcional)" name="fkIdEmpresa" placeholder="Dejar vacío para acceso total" value={form.fkIdEmpresa} onChange={handleChange} error={errores.fkIdEmpresa} type="number" />
+          <div>
+            <label style={styles.label}>Empresa (opcional)</label>
+            <select
+              name="fkIdEmpresa"
+              value={form.fkIdEmpresa}
+              onChange={handleChange}
+              style={{
+                ...styles.input,
+                borderColor: errores.fkIdEmpresa ? '#e53e3e' : '#D0D0D0',
+                color: form.fkIdEmpresa ? '#272525' : '#A3A3A3',
+              }}
+            >
+              <option value="">Dejar vacío para acceso total</option>
+              {cargandoEmpresas
+                ? <option disabled>Cargando empresas...</option>
+                : empresas.map(e => (
+                    <option key={e.empresaId} value={e.empresaId}>
+                      {e.nombreEmpresa}
+                    </option>
+                  ))
+              }
+            </select>
+            {errores.fkIdEmpresa && <span style={styles.errorTexto}>{errores.fkIdEmpresa}</span>}
+          </div>
         </div>
       </div>
 

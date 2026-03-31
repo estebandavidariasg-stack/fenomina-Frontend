@@ -4,6 +4,8 @@ import { useAuthStore } from "../../../../../store/authStore";
 import { Users, ChevronDown, ChevronLeft, ChevronRight, Plus, Trash2, Calendar } from 'lucide-react';
 import MensajeModal from "../../../../../components/MensajeModal";
 import ConfirmarCambiosModal from "../../../../../components/ConfirmarCambiosModal";
+import empleadosService from '../../../../../services/empleadosService';
+import contratoConceptoService from '../../../../../services/contratoConceptoService';
 
 function CalendarioInput({ value, onChange, placeholder = 'DD/MM/YYYY', error }) {
   const [abierto, setAbierto] = useState(false);
@@ -102,7 +104,7 @@ const MSG_FECHA  = 'Debes seleccionar una fecha';
 
 export default function CrearEmpleadoPage() {
   const navigate    = useNavigate();
-  const { id }      = useParams();
+  const { id: empresaId } = useParams();
   const { usuario } = useAuthStore();
 
   const inicial = usuario?.nombresUsuario?.charAt(0).toUpperCase() ?? 'U';
@@ -155,7 +157,58 @@ export default function CrearEmpleadoPage() {
   };
 
   const handleSubmit    = () => { if (!validar()) return; setConfirmar(true); };
-  const handleConfirmar = () => { setConfirmar(false); setModal('exito'); };
+  const handleConfirmar = async () => {
+    setConfirmar(false);
+
+    // Mapeo front → EmpleadoRequestDTO
+    const [dia, mes, anio] = form.fechaIngreso.split('/');
+    const [diaFin, mesFin, anioFin] = form.fechaFinContrato.split('/');
+
+    const empleadoDTO = {
+      empresaId:          Number(empresaId),
+      tipoDocumento:      form.tipoDocumento,        // enum: CC, CE, PA, etc.
+      documentoEmp:       form.numeroDocumento,
+      nombresEmp:         form.nombresEmpleado,
+      apellidosEmp:       form.apellidosEmpleado,
+      direccionEmp:       form.direccion,
+      tipoContratoEmp:    form.tipoContrato.toUpperCase(), // back espera enum
+      fechaIngresoEmp:    `${anio}-${mes}-${dia}`,         // ISO: YYYY-MM-DD
+      fechaFinContrato:   `${anioFin}-${mesFin}-${diaFin}`,
+      cargoEmp:           form.cargo,
+      salarioBascMensual: parseFloat(form.salario),
+      claseRiesgo:        form.claseRiesgo,           // enum: I, II, III, IV, V
+      tipoCotizante:      form.tipoCotizante,
+      subtipoCotizante:   form.subtipoCotizante,
+      nombreArl:          form.arl,
+      nombreEps:          form.eps,
+      fondoPensionEmp:    form.fondoPensiones,
+      cajaCompensacion:   form.cajaCompensacion,
+      fondoCesantiasEmp:  form.fondoCesantias,
+      estaExnrdParafis:   false,
+      jornadaTrabajoEmp:  form.jornada.toUpperCase(), // enum
+    };
+
+    try {
+      const { data: nuevoEmpleado } = await empleadosService.crearEmpleado(empleadoDTO);
+
+      // Si hay conceptos con nombre y valor, crearlos también
+      const conceptosValidos = conceptos.filter(c => c.nombre && c.valor);
+      await Promise.all(
+        conceptosValidos.map(c =>
+          contratoConceptoService.crearConcepto({
+            empleadoId:      nuevoEmpleado.empleadoId,
+            conceptoNominaId: Number(c.nombre), // ajustar según tu lógica
+            valorFijo:        parseFloat(c.valor),
+          })
+        )
+      );
+
+      setModal('exito');
+    } catch (err) {
+      setModal('error');
+      console.error(err.response?.data?.message ?? 'Error al crear empleado');
+    }
+  };
 
   const inputStyle  = (c) => ({ ...styles.input,  border: errores[c] ? '1px solid #E53E3E' : '1px solid #D0D0D0' });
   const selectStyle = (c) => ({ ...styles.select, border: errores[c] ? '1px solid #E53E3E' : '1px solid #D0D0D0' });
