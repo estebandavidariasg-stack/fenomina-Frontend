@@ -282,18 +282,22 @@ export default function VerEmpleadoPage() {
         >
           Regresar
         </button>
-        <button
-          style={{
-            ...styles.btnEditar,
-            background: hoverEditar ? 'linear-gradient(135deg, #0B662A, #1a9e45)' : '#0B662A',
-            transition: 'background 0.3s ease',
-          }}
-          onMouseEnter={() => setHoverEditar(true)}
-          onMouseLeave={() => setHoverEditar(false)}
-          onClick={() => navigate(`/empresas/${id}/empleados/${empleadoId}/editar`)}
-        >
-          Editar Información
-        </button>
+        
+        {usuario?.rolUsuario !== 'CLIENTE_EMPRESA' && usuario?.rolUsuario !== 'AUDITOR' && (
+          <button
+            style={{
+              ...styles.btnEditar,
+              background: hoverEditar ? 'linear-gradient(135deg, #0B662A, #1a9e45)' : '#0B662A',
+              transition: 'background 0.3s ease',
+            }}
+            onMouseEnter={() => setHoverEditar(true)}
+            onMouseLeave={() => setHoverEditar(false)}
+            onClick={() => navigate(`/empresas/${id}/empleados/${empleadoId}/editar`)}
+          >
+            Editar Información
+          </button>
+        )}
+        
       </div>
 
     </div>

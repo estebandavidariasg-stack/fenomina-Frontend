@@ -37,7 +37,7 @@ export default function MainLayout() {
     { to: '/empresas', label: 'Empresas', icon: <Building2 size={16} /> },
     ...(esSuperAdmin ? [{ to: '/parametros', label: 'Parámetros Generales', icon: <Settings2 size={16} /> }] : []),
     ...(esSuperAdmin ? [{ to: '/usuarios', label: 'Usuarios', icon: <UserRound size={16} /> }] : []),
-    { to: '/logs', label: 'Logs FENomina', icon: <ScrollText size={16} /> },
+    ...(esSuperAdmin ? [{ to: '/logs', label: 'Logs FENomina', icon: <ScrollText size={16} /> }] : []),
   ];
 
   return (

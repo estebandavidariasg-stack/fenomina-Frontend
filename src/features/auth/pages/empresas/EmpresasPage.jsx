@@ -119,13 +119,14 @@ export default function EmpresasPage() {
         ) : (
           <div style={styles.grid}>
 
-            {/* Tarjeta añadir */}
-            <div style={styles.gridCard} onClick={() => navigate('/empresas/crear')}>
-              <Carpeta dashed={true}>
-                <Plus size={36} color="#0B662A" />
-              </Carpeta>
-              <p style={styles.cardLabel}>Añadir nueva empresa</p>
-            </div>
+            {usuario?.rolUsuario !== 'CLIENTE_EMPRESA' && usuario?.rolUsuario !== 'AUDITOR' && (
+              <div style={styles.gridCard} onClick={() => navigate('/empresas/crear')}>
+                <Carpeta dashed={true}>
+                  <Plus size={36} color="#0B662A" />
+                </Carpeta>
+                <p style={styles.cardLabel}>Añadir nueva empresa</p>
+              </div>
+            )}
 
             {/* Tarjetas empresas */}
             {empresas.map((empresa) => (
