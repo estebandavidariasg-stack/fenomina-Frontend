@@ -42,7 +42,7 @@ export default function EmpleadosPage() {
 
   const handleConfirmarEstado = async () => {
     try {
-      await empleadosService.cambiarEstado(empleadoSeleccionado.empleadoId, nuevoEstado);
+      await empleadosService.cambiarEstado(empleadoSeleccionado.empleadoId, nuevoEstado.toUpperCase());
       setModalEstado(false);
       setModal('exito');
       recargar(); // refresca la tabla

@@ -95,8 +95,8 @@ export default function InfoEmpresaPage() {
           <p style={styles.seccionTitulo}>Logo Empresa</p>
           <div style={styles.logoBox}>
             <div style={styles.fotoCirculo}>
-              {empresa.logo
-                ? <img src={`${import.meta.env.VITE_MASTER_API_URL}${empresa.logoEmpresaUrl}`} alt="logo" style={styles.fotoImg} />
+              {empresa.logoEmpresaUrl
+                ? <img src={`${import.meta.env.VITE_MASTER_API_URL}/api/master/files/logos/${empresa.logoEmpresaUrl}`} alt="logo" style={styles.fotoImg} />
                 : <Building2 size={32} color="#A3A3A3" />
               }
             </div>

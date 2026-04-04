@@ -1,10 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAuthStore } from '../../../../store/authStore';
-import {
-  Building2, Users, CreditCard,
-  Coins, Globe, ChevronLeft
-} from 'lucide-react';
+import { Building2, Users, FileText, CreditCard, Coins, Globe, ChevronLeft } from 'lucide-react';
+import empresasService from '../../../../services/empresasService';
 
 function Carpeta({ children }) {
   return (
@@ -14,10 +12,8 @@ function Carpeta({ children }) {
         fill="#DDE8DC"
       />
       <foreignObject x="10" y="30" width="140" height="90">
-        <div
-          xmlns="http://www.w3.org/1999/xhtml"
-          style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}
-        >
+        <div xmlns="http://www.w3.org/1999/xhtml"
+          style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
           {children}
         </div>
       </foreignObject>
@@ -25,28 +21,43 @@ function Carpeta({ children }) {
   );
 }
 
-const MODULOS_TRES = [
-  { id: 'info',      label: 'Información Empresa',  icon: <Building2 size={52} color="#0B662A" />,  ruta: 'info' },
-  { id: 'empleados', label: 'Empleados',             icon: <Users size={52} color="#0B662A" />,      ruta: 'empleados' },
-  { id: 'primas',    label: 'Primas',                icon: <CreditCard size={52} color="#0B662A" />, ruta: 'primas' },
-  { id: 'cesantias', label: 'Cesantías e Intereses', icon: <Coins size={52} color="#0B662A" />,      ruta: 'cesantias' },
-  { id: 'reportes',  label: 'Reportes',              icon: <Globe size={52} color="#0B662A" />,      ruta: 'reportes' },
+const MODULOS_BASE = [
+  { id: 'info',      label: 'Información Empresa',  icon: <Building2 size={52} color="#0B662A" />,  ruta: 'info',      siempre: true },
+  { id: 'empleados', label: 'Empleados',             icon: <Users size={52} color="#0B662A" />,      ruta: 'empleados', siempre: true },
+  { id: 'nominas',   label: 'Nóminas',               icon: <FileText size={52} color="#0B662A" />,   ruta: 'nominas',   campo: 'aplicaNomina' },
+  { id: 'primas',    label: 'Primas',                icon: <CreditCard size={52} color="#0B662A" />, ruta: 'primas',    campo: 'aplicaPrima' },
+  { id: 'cesantias', label: 'Cesantías e Intereses', icon: <Coins size={52} color="#0B662A" />,      ruta: 'cesantias', campo: 'aplicaCesantias' },
+  { id: 'reportes',  label: 'Reportes',              icon: <Globe size={52} color="#0B662A" />,      ruta: 'reportes',  siempre: true },
 ];
 
-export default function EmpresasModuloOpTres() {
-  const navigate    = useNavigate();
-  const { id }      = useParams();
+export default function EmpresaModulosPage() {
+  const navigate = useNavigate();
+  const { id } = useParams();
   const { usuario } = useAuthStore();
   const [hoverVolver, setHoverVolver] = useState(false);
+  const [empresa, setEmpresa] = useState(null);
+  const [cargando, setCargando] = useState(true);
 
   const inicial = usuario?.nombresUsuario?.charAt(0).toUpperCase() ?? 'U';
   const nombre  = `${usuario?.nombresUsuario ?? ''} ${usuario?.apellidosUsuario ?? ''}`.trim();
   const cargo   = usuario?.cargoUsuario ?? '';
 
+  useEffect(() => {
+    empresasService.getEmpresaById(id)
+      .then(({ data }) => setEmpresa(data))
+      .catch(() => setEmpresa(null))
+      .finally(() => setCargando(false));
+  }, [id]);
+
+  if (cargando) return <p>Cargando...</p>;
+  if (!empresa) return <p>Empresa no encontrada.</p>;
+
+  const modulosVisibles = MODULOS_BASE.filter(m =>
+    m.siempre || (empresa[m.campo] === true)
+  );
+
   return (
     <div style={styles.container}>
-
-      {/* Header */}
       <div style={styles.header}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <Building2 size={18} color="#0B662A" />
@@ -55,8 +66,6 @@ export default function EmpresasModuloOpTres() {
             <p style={styles.subtitulo}>Selecciona el módulo al que deseas acceder</p>
           </div>
         </div>
-
-        {/* Perfil usuario */}
         <div style={styles.perfilBox}>
           <div style={styles.avatar}>{inicial}</div>
           <div>
@@ -66,7 +75,6 @@ export default function EmpresasModuloOpTres() {
         </div>
       </div>
 
-      {/* Volver */}
       <button
         style={{ ...styles.volverBtn, color: hoverVolver ? '#0B662A' : '#272525' }}
         onClick={() => navigate('/empresas')}
@@ -77,20 +85,12 @@ export default function EmpresasModuloOpTres() {
         <span>Volver</span>
       </button>
 
-      {/* Área que centra el card */}
       <div style={styles.areaContenido}>
         <div style={styles.card}>
           <div style={styles.grid}>
-            {MODULOS_TRES.map((modulo, index) => (
-              <div
-                key={modulo.id}
-                style={{
-                  ...styles.moduloCard,
-                  ...(index === 3 ? { gridColumn: '1' } : {}),
-                  ...(index === 4 ? { gridColumn: '2' } : {}),
-                }}
-                onClick={() => navigate(`/empresas/${id}/${modulo.ruta}`)}
-              >
+            {modulosVisibles.map((modulo) => (
+              <div key={modulo.id} style={styles.moduloCard}
+                onClick={() => navigate(`/empresas/${id}/${modulo.ruta}`)}>
                 <Carpeta>{modulo.icon}</Carpeta>
                 <p style={styles.moduloLabel}>{modulo.label}</p>
               </div>
@@ -98,7 +98,6 @@ export default function EmpresasModuloOpTres() {
           </div>
         </div>
       </div>
-
     </div>
   );
 }

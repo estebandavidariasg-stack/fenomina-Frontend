@@ -3,9 +3,10 @@ import empleadosService from '../../../../../services/empleadosService';
 import contratoConceptoService from '../../../../../services/contratoConceptoService';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAuthStore } from "../../../../../store/authStore";
-import { Users, ChevronDown, ChevronLeft, ChevronRight, Plus, Trash2, Calendar } from 'lucide-react';
+import { Users, ChevronDown, ChevronLeft, ChevronRight, Plus, Trash2, Calendar, AlertTriangle } from 'lucide-react';
 import MensajeModal from "../../../../../components/MensajeModal";
 import ConfirmarCambiosModal from "../../../../../components/ConfirmarCambiosModal";
+import parametrosService from '../../../../../services/parametrosService';
 
 function CalendarioInput({ value, onChange, placeholder = 'DD/MM/YYYY', error }) {
   const [abierto, setAbierto] = useState(false);
@@ -117,6 +118,9 @@ export default function EditarEmpleadoPage() {
   const [hoverGuardar, setHoverGuardar]   = useState(false);
   const [hoverRegresar, setHoverRegresar] = useState(false);  
 
+  const [smmlv, setSmmlv] = useState(null);
+  const [advertenciaAux, setAdvertenciaAux] = useState(false);
+
   const [cargando, setCargando] = useState(true);
   const [conceptos,          setConceptos]          = useState([{ contratoConceptId: null, conceptoNominaId: '', valor: '' }]);
   const [conceptosOriginales, setConceptosOriginales] = useState([]);
@@ -130,6 +134,47 @@ export default function EditarEmpleadoPage() {
     eps: '', fondoPensiones: '', arl: '',
     claseRiesgo: '', fondoCesantias: '', cajaCompensacion: '',
   });
+
+  const MAPA_TIPO_CONTRATO_INVERSO = {
+    'TERMINO_FIJO':                  'fijo',
+    'TERMINO_INDEFINIDO':            'indefinido',
+    'OBRA_LABOR':                    'obra',
+    'APRENDIZAJE':                   'aprendizaje',
+    'TEMPORAL_OCASIONAL_ACCIDENTAL': 'temporal',
+    'OTRO':                          'otro',
+  };
+
+  const MAPA_JORNADA_INVERSO = {
+    'UNICA':    'unica',
+    'TURNOS':   'turnos',
+    'ROTATIVA': 'rotativa',
+  };
+
+  const MAPA_TIPO_COTIZANTE_INVERSO = {
+    'DEPENDIENTE':                        '01',
+    'SERVICIO_DOMESTICO':                 '02',
+    'INDEPENDIENTE':                      '03',
+    'APRENDIZ_SENA_LECTIVA':              '12',
+    'APRENDIZ_SENA_PRODUCTIVA':           '19',
+    'ESTUDIANTE_LEY_789':                 '20',
+    'ESTUDIANTE_SOLO_ARL':                '23',
+    'COTIZANTE_EMERGENCIA_1':             '44',
+    'COTIZANTE_EMERGENCIA_2':             '45',
+    'TIEMPO_PARCIAL':                     '51',
+    'INDEPENDIENTE_PRESTACION_SERVICIOS': '59',
+  };
+
+  const MAPA_SUBTIPO_COTIZANTE_INVERSO = {
+    'CODIGO_0':  '0',
+    'CODIGO_1':  '1',
+    'CODIGO_3':  '3',
+    'CODIGO_4':  '4',
+    'CODIGO_5':  '5',
+    'CODIGO_6':  '6',
+    'CODIGO_9':  '9',
+    'CODIGO_11': '11',
+    'CODIGO_12': '12',
+  };
 
   const MAPA_CLASE_RIESGO_INVERSO = {
     'CLASE_I':   'I',
@@ -159,12 +204,12 @@ export default function EditarEmpleadoPage() {
           apellidosEmpleado: emp.apellidosEmp,
           direccion:         emp.direccionEmp     ?? '',
           cargo:             emp.cargoEmp         ?? '',
-          tipoContrato:      emp.tipoContratoEmp?.toLowerCase()  ?? '',
-          jornada:           emp.jornadaTrabajoEmp?.toLowerCase() ?? '',
+          tipoContrato:      MAPA_TIPO_CONTRATO_INVERSO[emp.tipoContratoEmp] ?? '',
+          jornada:           MAPA_JORNADA_INVERSO[emp.jornadaTrabajoEmp] ?? '',
           fechaIngreso:      toDisplay(emp.fechaIngresoEmp),
           fechaFinContrato:  toDisplay(emp.fechaFinContrato),
-          tipoCotizante:     emp.tipoCotizante,
-          subtipoCotizante:  emp.subtipoCotizante,
+          tipoCotizante:     MAPA_TIPO_COTIZANTE_INVERSO[emp.tipoCotizante] ?? '',
+          subtipoCotizante:  MAPA_SUBTIPO_COTIZANTE_INVERSO[emp.subtipoCotizante] ?? '',
           fechaRetiro:       toDisplay(emp.fechaRetiroEmp),
           salario:           emp.salarioBascMensual?.toString() ?? '',
           auxTransporte:     emp.tieneAuxTransporte ? 'SI' : 'NO',
@@ -192,7 +237,20 @@ export default function EditarEmpleadoPage() {
       .finally(() => setCargando(false));
   }, [empleadoId]);
 
+  useEffect(() => {
+    parametrosService.getParametros()
+      .then(({ data }) => {
+        const hoy = new Date();
+        const smmlvParams = data
+          .filter(p => p.nombreParamGeneral === 'SMMLV' && new Date(p.fechaParamGeneral) <= hoy)
+          .sort((a, b) => new Date(b.fechaParamGeneral) - new Date(a.fechaParamGeneral));
+        if (smmlvParams.length > 0) setSmmlv(smmlvParams[0].valorParamGeneral);
+      })
+      .catch(console.error);
+  }, []);
+
   if (cargando) return <p>Cargando...</p>;
+
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -221,7 +279,15 @@ export default function EditarEmpleadoPage() {
     return Object.keys(nuevosErrores).length === 0;
   };
 
-  const handleSubmit    = () => { if (!validar()) return; setConfirmar(true); };
+  const handleSubmit = () => {
+    if (!validar()) return;
+    const salario = parseFloat(form.salario);
+    if (smmlv && form.auxTransporte === 'SI' && salario > smmlv * 2) {
+      setAdvertenciaAux(true);
+      return;
+    }
+    setConfirmar(true);
+  };
 
   const MAPA_TIPO_CONTRATO = {
     fijo:        'TERMINO_FIJO',
@@ -311,6 +377,8 @@ export default function EditarEmpleadoPage() {
       cajaCompensacion:   form.cajaCompensacion,
       fondoCesantiasEmp:  form.fondoCesantias,
       jornadaTrabajoEmp:  MAPA_JORNADA[form.jornada?.toLowerCase().trim()],
+      fechaRetiroEmp: toISO(form.fechaRetiro) ?? null,
+      tieneAuxTransporte: form.auxTransporte === 'SI',
     };
 
     try {
@@ -402,11 +470,13 @@ export default function EditarEmpleadoPage() {
             <div style={styles.selectWrapper}>
               <select name="tipoDocumento" value={form.tipoDocumento} onChange={handleChange} style={selectStyle('tipoDocumento')}>
                 <option value="">Seleccionar opción</option>
-                <option value="RC">Registro Civil de Nacimiento</option>
                 <option value="CC">Cédula de Ciudadanía</option>
                 <option value="CE">Cédula de Extranjería</option>
-                <option value="PA">Pasaporte</option>
+                <option value="TI">Tarjeta de Identidad</option>
+                <option value="PEP">PEP</option>
+                <option value="NIT">NIT</option>
                 <option value="PPT">PPT</option>
+                <option value="PA">Pasaporte</option>
               </select>
               <ChevronDown size={16} color="#A3A3A3" style={styles.selectIcon} />
             </div>
@@ -676,6 +746,33 @@ export default function EditarEmpleadoPage() {
           Guardar Cambios
         </button>
       </div>
+
+      {advertenciaAux && (
+        <div style={styles.modalOverlay}>
+          <div style={styles.modalBox}>
+            <div style={{ ...styles.modalIconCircle, backgroundColor: '#fef3c7' }}>
+              <AlertTriangle size={36} color="#b45309" strokeWidth={1.5} />
+            </div>
+            <h3 style={styles.modalTitulo}>Advertencia</h3>
+            <p style={styles.modalMensaje}>
+              El salario ingresado supera 2 SMMLV, por lo que este empleado no tiene derecho
+              al auxilio de transporte. ¿Deseas continuar con la actualización del empleado
+              con auxilio de transporte de todas formas?
+            </p>
+            <div style={styles.modalBotones}>
+              <button onClick={() => setAdvertenciaAux(false)} style={styles.btnCancelar}>
+                Cancelar
+              </button>
+              <button
+                onClick={() => { setAdvertenciaAux(false); setConfirmar(true); }}
+                style={styles.btnConfirmar}
+              >
+                Continuar de todas formas
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <ConfirmarCambiosModal visible={confirmar} onCancelar={() => setConfirmar(false)} onConfirmar={handleConfirmar} />
       <MensajeModal tipo={modal} onClose={() => { setModal(null); if (modal === 'exito') navigate(-1); }} />

@@ -1,11 +1,13 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAuthStore } from "../../../../../store/authStore";
-import { Users, ChevronDown, ChevronLeft, ChevronRight, Plus, Trash2, Calendar } from 'lucide-react';
+import { Users, ChevronDown, ChevronLeft, ChevronRight, Plus, Trash2, Calendar, AlertTriangle } from 'lucide-react';
 import MensajeModal from "../../../../../components/MensajeModal";
 import ConfirmarCambiosModal from "../../../../../components/ConfirmarCambiosModal";
 import empleadosService from '../../../../../services/empleadosService';
 import contratoConceptoService from '../../../../../services/contratoConceptoService';
+import parametrosService from '../../../../../services/parametrosService';
+
 
 function CalendarioInput({ value, onChange, placeholder = 'DD/MM/YYYY', error }) {
   const [abierto, setAbierto] = useState(false);
@@ -116,6 +118,9 @@ export default function CrearEmpleadoPage() {
   const [errores, setErrores]           = useState({});
   const [hoverCrear, setHoverCrear]     = useState(false);
   const [hoverRegresar, setHoverRegresar] = useState(false);
+  
+  const [smmlv, setSmmlv] = useState(null);
+  const [advertenciaAux, setAdvertenciaAux] = useState(false);
 
   const [form, setForm] = useState({
     tipoDocumento:    '', numeroDocumento:  '', nombresEmpleado:  '',
@@ -128,6 +133,19 @@ export default function CrearEmpleadoPage() {
   });
 
   const [conceptos, setConceptos] = useState([{ nombre: '', valor: '' }]);
+
+  useEffect(() => {
+    parametrosService.getParametros()
+      .then(({ data }) => {
+        const hoy = new Date();
+        const smmlvParams = data
+          .filter(p => p.nombreParamGeneral === 'SMMLV' && new Date(p.fechaParamGeneral) <= hoy)
+          .sort((a, b) => new Date(b.fechaParamGeneral) - new Date(a.fechaParamGeneral));
+        if (smmlvParams.length > 0) setSmmlv(smmlvParams[0].valorParamGeneral);
+      })
+      .catch(console.error);
+  }, []);
+
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -156,7 +174,16 @@ export default function CrearEmpleadoPage() {
     return Object.keys(nuevosErrores).length === 0;
   };
 
-  const handleSubmit    = () => { if (!validar()) return; setConfirmar(true); };
+  const handleSubmit = () => {
+    if (!validar()) return;
+    const salario = parseFloat(form.salario);
+    if (smmlv && form.auxTransporte === 'SI' && salario > smmlv * 2) {
+      setAdvertenciaAux(true);
+      return;
+    }
+    setConfirmar(true);
+  };
+
   const MAPA_TIPO_CONTRATO = {
     fijo:        'TERMINO_FIJO',
     indefinido:  'TERMINO_INDEFINIDO',
@@ -246,6 +273,7 @@ export default function CrearEmpleadoPage() {
       cajaCompensacion:   form.cajaCompensacion,
       fondoCesantiasEmp:  form.fondoCesantias,
       estaExnrdParafis:   false,
+      tieneAuxTransporte: form.auxTransporte === 'SI',
       jornadaTrabajoEmp:  MAPA_JORNADA[form.jornada],
     };
 
@@ -577,6 +605,33 @@ export default function CrearEmpleadoPage() {
           Regresar
         </button>
       </div>
+
+      {advertenciaAux && (
+        <div style={styles.modalOverlay}>
+          <div style={styles.modalBox}>
+            <div style={{ ...styles.modalIconCircle, backgroundColor: '#fef3c7' }}>
+              <AlertTriangle size={36} color="#b45309" strokeWidth={1.5} />
+            </div>
+            <h3 style={styles.modalTitulo}>Advertencia</h3>
+            <p style={styles.modalMensaje}>
+              El salario ingresado supera 2 SMMLV, por lo que este empleado no tiene derecho
+              al auxilio de transporte. ¿Deseas continuar con la creación del empleado
+              con auxilio de transporte de todas formas?
+            </p>
+            <div style={styles.modalBotones}>
+              <button onClick={() => setAdvertenciaAux(false)} style={styles.btnCancelar}>
+                Cancelar
+              </button>
+              <button
+                onClick={() => { setAdvertenciaAux(false); setConfirmar(true); }}
+                style={styles.btnConfirmar}
+              >
+                Continuar de todas formas
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <ConfirmarCambiosModal visible={confirmar} onCancelar={() => setConfirmar(false)} onConfirmar={handleConfirmar} />
       <MensajeModal tipo={modal} onClose={() => { setModal(null); if (modal === 'exito') navigate(-1); }} />
