@@ -1,10 +1,9 @@
 import { useState } from 'react'; 
-import { UserCircle } from 'lucide-react';
 import empleadosService from '../../../../../services/empleadosService';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAuthStore } from '../../../../../store/authStore';
 import { useEmpleados } from '../../../hooks/useEmpleados';
-import { Users, Search, Eye, ChevronLeft } from 'lucide-react';
+import { Users, Search, Eye, ChevronLeft, UserRound } from 'lucide-react';
 import EstadoDropdown from '../../../../../components/EstadoDropdown';
 import ConfirmarCambiosModal from '../../../../../components/ConfirmarCambiosModal';
 import MensajeModal from '../../../../../components/MensajeModal';
@@ -102,7 +101,7 @@ export default function EmpleadosEmpresaPage() {
         </div>
         <div style={styles.perfilBox}>
           <div style={styles.avatar}>
-            <UserCircle size={28} color="#555" />
+            <UserRound size={22} color="#A3A3A3" />
           </div>
           <div>
             <p style={styles.perfilNombre}>{nombre}</p>

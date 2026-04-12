@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAuthStore } from '../../../../../store/authStore';
-import { FileText, Search, ChevronLeft } from 'lucide-react';
+import { FileText, Search, ChevronLeft , UserRound} from 'lucide-react';
 
 const MOCK_REPORTE = [
   { id: 1,  nombres: 'Abubakar',  apellidos: 'Alghazali',    periodo: '2025-06-03', documento: '10726589786', diasLab: 15, totalDevengSal: '$100.500,00', totalDevengNoSal: '₦224.000,00', otrosPagosNoSal: '₦224.000,00', totalVacaciones: '$200.000,00', totalLicRem: '$150.000', totalLicNoRem: '$150.000,00', totalIncap: '$0', totalDevengado: '$100.500,00', totalDedSeg: '₦224.000,00', retencionFuente: '₦224.000,00', otrosDeducibles: '$200.000,00', totalDeducciones: '$200.000,00', totalNeto: '$1.623.500,00' },
@@ -77,7 +77,9 @@ export default function ReporteLiquidacionPage() {
           </div>
         </div>
         <div style={styles.perfilBox}>
-          <div style={styles.avatar}>{inicial}</div>
+          <div style={styles.avatar}>
+            <UserRound size={22} color="#A3A3A3" />
+          </div>
           <div>
             <p style={styles.perfilNombre}>{nombre}</p>
             <p style={styles.perfilCargo}>{cargo}</p>

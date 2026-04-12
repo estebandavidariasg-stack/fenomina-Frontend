@@ -1,12 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAuthStore } from '../../../../store/authStore';
-import { Building2, Camera, ChevronDown } from 'lucide-react';
+import { Building2, Camera, ChevronDown, UserRound} from 'lucide-react';
 import MensajeModal from '../../../../components/MensajeModal';
 import ConfirmarCambiosModal from '../../../../components/ConfirmarCambiosModal';
 import empresasService from '../../../../services/empresasService';
-import { UserCircle } from 'lucide-react';
-
 
 export default function EditarEmpresaPage() {
   const navigate    = useNavigate();
@@ -119,9 +117,9 @@ export default function EditarEmpresaPage() {
           </div>
         </div>
         <div style={styles.perfilBox}>
-          <div style={styles.avatar}>
-            <UserCircle size={28} color="#555" />
-          </div>
+         <div style={styles.avatar}>
+            <UserRound size={22} color="#A3A3A3" />
+         </div>
           <div>
             <p style={styles.perfilNombre}>{nombre}</p>
             <p style={styles.perfilCargo}>{cargo}</p>

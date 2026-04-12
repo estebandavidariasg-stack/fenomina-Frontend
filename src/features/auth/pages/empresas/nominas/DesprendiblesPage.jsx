@@ -1,12 +1,11 @@
 import { useState, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAuthStore } from '../../../../../store/authStore';
-import { FileText, ChevronLeft, Download } from 'lucide-react';
+import { FileText, ChevronLeft, Download , UserRound} from 'lucide-react';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import ConfirmarCambiosModal from '../../../../../components/ConfirmarCambiosModal';
 import MensajeModal from '../../../../../components/MensajeModal';
-import { UserCircle } from 'lucide-react';
 
 function DescargaModal({ visible }) {
   if (!visible) return null;
@@ -209,7 +208,7 @@ export default function DesprendiblesPage() {
         </div>
         <div style={styles.perfilBox}>
           <div style={styles.avatar}>
-            <UserCircle size={28} color="#555" />
+            <UserRound size={22} color="#A3A3A3" />
           </div>
           <div>
             <p style={styles.perfilNombre}>{nombre}</p>

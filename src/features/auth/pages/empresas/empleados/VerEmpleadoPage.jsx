@@ -1,9 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAuthStore } from "../../../../../store/authStore";
-import { Users, ChevronDown, Calendar } from 'lucide-react';
+import { Users, ChevronDown, Calendar , UserRound} from 'lucide-react';
 import empleadosService from '../../../../../services/empleadosService';
-import { UserCircle } from 'lucide-react';
 
 export default function VerEmpleadoPage() {
   const navigate    = useNavigate();
@@ -51,7 +50,7 @@ export default function VerEmpleadoPage() {
         </div>
         <div style={styles.perfilBox}>
           <div style={styles.avatar}>
-            <UserCircle size={28} color="#555" />
+            <UserRound size={22} color="#A3A3A3" />
           </div>
           <div>
             <p style={styles.perfilNombre}>{nombre}</p>

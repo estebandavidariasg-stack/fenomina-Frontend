@@ -26,6 +26,8 @@ import ReporteLiquidacionPage from '../features/auth/pages/empresas/nominas/Repo
 import NovedadesPage from '../features/auth/pages/empresas/nominas/NovedadesPage';
 import GenerarReportePage from '../features/auth/pages/empresas/nominas/GenerarReportePage';
 import DesprendiblesPage from '../features/auth/pages/empresas/nominas/DesprendiblesPage';
+import ParametrosGeneralesPage from '../features/auth/pages/parametros/ParametrosGeneralesPage';
+
 
 function RutaRaiz() {
   const { accessToken } = useAuthStore();
@@ -78,6 +80,10 @@ export default function AppRouter() {
             <Route path="/empresas/:id/nominas/:nominaId/novedades" element={<NovedadesPage />} />
             <Route path="/empresas/:id/nominas/generar-reporte" element={<GenerarReportePage />} />
             <Route path="/empresas/:id/nominas/desprendibles" element={<DesprendiblesPage />} />
+
+            {/* Parámetros */}
+            <Route path="/parametros" element={<ParametrosGeneralesPage />} />
+
 
           </Route>
         </Route>

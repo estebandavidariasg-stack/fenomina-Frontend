@@ -1,8 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { UserCircle } from 'lucide-react';
 import { useAuthStore } from "../../../../../store/authStore";
-import { Users, ChevronDown, ChevronLeft, ChevronRight, Plus, Trash2, Calendar } from 'lucide-react';
+import { Users, ChevronDown, ChevronLeft, ChevronRight, Plus, Trash2, Calendar,UserRound } from 'lucide-react';
 import MensajeModal from "../../../../../components/MensajeModal";
 import ConfirmarCambiosModal from "../../../../../components/ConfirmarCambiosModal";
 import empleadosService from '../../../../../services/empleadosService';
@@ -204,7 +203,7 @@ export default function CrearEmpleadoPage() {
         </div>
         <div style={styles.perfilBox}>
           <div style={styles.avatar}>
-            <UserCircle size={28} color="#555" />
+            <UserRound size={22} color="#A3A3A3" />
           </div>
           <div><p style={styles.perfilNombre}>{nombre}</p><p style={styles.perfilCargo}>{cargo}</p></div>
         </div>

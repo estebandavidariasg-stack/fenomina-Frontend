@@ -1,10 +1,9 @@
 import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAuthStore } from '../../../../../store/authStore';
-import { FileText, Search, ChevronLeft, ChevronDown, Eye, FilePen } from 'lucide-react';
+import { FileText, Search, ChevronLeft, ChevronDown, Eye, FilePen, UserRound } from 'lucide-react';
 import ConfirmarCambiosModal from '../../../../../components/ConfirmarCambiosModal';
 import MensajeModal from '../../../../../components/MensajeModal';
-import { UserCircle } from 'lucide-react';
 
 const MOCK_NOMINAS = [
   { id: 1,  nombres: 'Pepito',         apellidos: 'Perez',               fechaIngreso: '30/01/2023', documento: '10528967', valorNomina: '1.750.095', periodoLiq: '2025-06-15', estado: 'Cerrado' },
@@ -106,7 +105,7 @@ export default function LiquidarNominasPage() {
         </div>
         <div style={styles.perfilBox}>
           <div style={styles.avatar}>
-            <UserCircle size={28} color="#555" />
+            <UserRound size={22} color="#A3A3A3" />
           </div>
           <div>
             <p style={styles.perfilNombre}>{nombre}</p>

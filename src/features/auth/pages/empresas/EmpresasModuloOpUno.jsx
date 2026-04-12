@@ -5,7 +5,7 @@ import { useAuthStore } from '../../../../store/authStore';
 import {
   Building2, Users, FileText,
   CreditCard, Coins, Globe,
-  ChevronLeft
+  ChevronLeft, UserRound
 } from 'lucide-react';
 
 function Carpeta({ children }) {
@@ -61,7 +61,9 @@ export default function EmpresaModuloOpUno() {
 
         {/* Perfil usuario */}
         <div style={styles.perfilBox}>
-          <div style={styles.avatar}>{inicial}</div>
+          <div style={styles.avatar}>
+            <UserRound size={22} color="#A3A3A3" />
+          </div>
           <div>
             <p style={styles.perfilNombre}>{nombre}</p>
             <p style={styles.perfilCargo}>{cargo}</p>

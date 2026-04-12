@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { useEmpresas } from '../../hooks/useEmpresas';
 import { useAuthStore } from '../../../../store/authStore';
-import { Building2, Plus, Search } from 'lucide-react';
+import { Building2, Plus, Search, UserRound } from 'lucide-react';
 
 function Carpeta({ children, dashed = false }) {
   return (
@@ -56,7 +56,9 @@ export default function EmpresasPage() {
 
         {/* Perfil usuario */}
         <div style={styles.perfilBox}>
-          <div style={styles.avatar}>{inicial}</div>
+          <div style={styles.avatar}>
+            <UserRound size={22} color="#A3A3A3" />
+          </div>
           <div>
             <p style={styles.perfilNombre}>{nombre}</p>
             <p style={styles.perfilCargo}>{cargo}</p>
@@ -168,13 +170,12 @@ const styles = {
   totalLabel:    { fontSize: '12px', color: '#A3A3A3', margin: 0 },
   searchBox:     { display: 'flex', alignItems: 'center', gap: '8px', border: '1px solid #0B662A', borderRadius: '8px', padding: '8px 14px', backgroundColor: '#fff', width: '380px' },
   searchInput:   { border: 'none', outline: 'none', fontSize: '13px', width: '100%', fontFamily: 'Nunito, sans-serif' },
-  card:          { backgroundColor: '#fff', borderRadius: '16px', padding: '24px 32px' },
+  card:          { backgroundColor: '#fff', borderRadius: '16px', padding: '24px 32px' },  
   gridHeader:    { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' },
   gridTitle:     { fontSize: '16px', fontWeight: '700', color: '#272525' },
   showingBox:    { display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', color: '#272525' },
   select:        { border: '1px solid #D0D0D0', borderRadius: '6px', padding: '4px 8px', fontSize: '13px', fontFamily: 'Nunito, sans-serif', cursor: 'pointer' },
-  grid:          { display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '24px', marginBottom: '32px' },
-  gridCard:      { display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px', cursor: 'pointer' },
+  grid:          { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: '24px', marginBottom: '32px' },  gridCard:      { display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px', cursor: 'pointer' },
   cardLabel:     { fontSize: '13px', fontWeight: '600', color: '#272525', textAlign: 'center', margin: 0, maxWidth: '180px' },
   paginacion:    { display: 'flex', justifyContent: 'center', gap: '6px' },
   pageBtn:       { width: '36px', height: '36px', borderRadius: '6px', border: '1px solid #D0D0D0', cursor: 'pointer', fontSize: '13px', fontWeight: '600', backgroundColor: '#fff', color: '#272525', fontFamily: 'Nunito, sans-serif' },

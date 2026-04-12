@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAuthStore } from '../../../../store/authStore';
-import { Building2 } from 'lucide-react';
+import { Building2, UserRound } from 'lucide-react';
 import empresasService from '../../../../services/empresasService';
 
 export default function InfoEmpresaPage() {
@@ -41,7 +41,9 @@ export default function InfoEmpresaPage() {
           </div>
         </div>
         <div style={styles.perfilBox}>
-          <div style={styles.avatar}>{inicial}</div>
+          <div style={styles.avatar}>
+            <UserRound size={22} color="#A3A3A3" />
+          </div>
           <div>
             <p style={styles.perfilNombre}>{nombre}</p>
             <p style={styles.perfilCargo}>{cargo}</p>
