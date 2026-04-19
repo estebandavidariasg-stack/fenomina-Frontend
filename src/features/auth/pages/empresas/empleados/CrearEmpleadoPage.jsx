@@ -7,7 +7,7 @@ import ConfirmarCambiosModal from "../../../../../components/ConfirmarCambiosMod
 import empleadosService from '../../../../../services/empleadosService';
 import contratoConceptoService from '../../../../../services/contratoConceptoService';
 import parametrosService from '../../../../../services/parametrosService';
-
+import conceptoNominaService from '../../../../../services/conceptoNominaService';
 
 function CalendarioInput({ value, onChange, placeholder = 'DD/MM/YYYY', error }) {
   const [abierto, setAbierto] = useState(false);
@@ -36,6 +36,7 @@ function CalendarioInput({ value, onChange, placeholder = 'DD/MM/YYYY', error })
   const diaSeleccionado  = value ? Number(value.split('/')[0]) : null;
   const mesSeleccionado  = value ? Number(value.split('/')[1]) - 1 : null;
   const anioSeleccionado = value ? Number(value.split('/')[2]) : null;
+  
 
   const celdas = [];
   for (let i = 0; i < primerDia; i++) celdas.push({ dia: diasAnteriores - primerDia + 1 + i, actual: false });
@@ -132,7 +133,15 @@ export default function CrearEmpleadoPage() {
     fondoCesantias:   '', cajaCompensacion: '',
   });
 
-  const [conceptos, setConceptos] = useState([{ nombre: '', valor: '' }]);
+  const [conceptosNomina, setConceptosNomina] = useState([]);
+
+  const [conceptos, setConceptos] = useState([{ conceptoNominaId: '', valor: '' }]);
+
+  useEffect(() => {
+    conceptoNominaService.getConceptosContrato()
+      .then(({ data }) => setConceptosNomina(data))
+      .catch(() => setConceptosNomina([]));
+  }, []);
 
   useEffect(() => {
     parametrosService.getParametros()
@@ -157,8 +166,15 @@ export default function CrearEmpleadoPage() {
     setErrores({ ...errores, [campo]: '' });
   };
 
-  const agregarConcepto  = () => setConceptos([...conceptos, { nombre: '', valor: '' }]);
-  const eliminarConcepto = (i) => setConceptos(conceptos.filter((_, idx) => idx !== i));
+  const agregarConcepto = () => setConceptos([...conceptos, { conceptoNominaId: '', valor: '' }]);
+  const eliminarConcepto = (i) => {
+    if (conceptos.length === 1) {
+      // Limpiar los campos en vez de eliminar la fila
+      setConceptos([{ contratoConceptId: null, conceptoNominaId: '', valor: '' }]);
+    } else {
+      setConceptos(conceptos.filter((_, idx) => idx !== i));
+    }
+  };
   const handleConcepto   = (i, campo, valor) => { const n = [...conceptos]; n[i][campo] = valor; setConceptos(n); };
 
   const validar = () => {
@@ -281,12 +297,12 @@ export default function CrearEmpleadoPage() {
       const { data: nuevoEmpleado } = await empleadosService.crearEmpleado(empleadoDTO);
 
       // Si hay conceptos con nombre y valor, crearlos también
-      const conceptosValidos = conceptos.filter(c => c.nombre && c.valor);
+      const conceptosValidos = conceptos.filter(c => c.conceptoNominaId && c.valor);
       await Promise.all(
         conceptosValidos.map(c =>
           contratoConceptoService.crearConcepto({
-            empleadoId:      nuevoEmpleado.empleadoId,
-            conceptoNominaId: Number(c.nombre), // ajustar según tu lógica
+            empleadoId:       nuevoEmpleado.empleadoId,
+            conceptoNominaId: Number(c.conceptoNominaId),
             valorFijo:        parseFloat(c.valor),
           })
         )
@@ -553,13 +569,17 @@ export default function CrearEmpleadoPage() {
             <div style={{ ...styles.campo, flex: 1 }}>
               {i === 0 && <label style={styles.label}>Nombre concepto</label>}
               <div style={styles.selectWrapper}>
-                <select value={c.nombre} onChange={(e) => handleConcepto(i, 'nombre', e.target.value)} style={styles.select}>
+                <select
+                  value={c.conceptoNominaId ?? ''}
+                  onChange={(e) => handleConcepto(i, 'conceptoNominaId', e.target.value)}
+                  style={styles.select}
+                >
                   <option value="">Seleccionar opción</option>
-                  <option value="beneficio">Beneficio o Extralegal</option>
-                  <option value="bonificacion">Bonificaciones Habituales</option>
-                  <option value="viaticos">Viáticos Permanentes</option>
-                  <option value="constituyen">Otros pagos que constituyen salario</option>
-                  <option value="no_constituyen">Otros pagos que no constituyen salario</option>
+                  {conceptosNomina.map(cn => (
+                    <option key={cn.conceptoNominaId} value={cn.conceptoNominaId}>
+                      {cn.nombreConcepNomina}
+                    </option>
+                  ))}
                 </select>
                 <ChevronDown size={16} color="#A3A3A3" style={styles.selectIcon} />
               </div>
@@ -570,7 +590,10 @@ export default function CrearEmpleadoPage() {
             </div>
             <div style={{ display: 'flex', gap: '8px', paddingBottom: '2px' }}>
               <button style={styles.btnIcono} onClick={agregarConcepto}><Plus size={18} color="#0B662A" /></button>
-              <button style={{ ...styles.btnIcono, opacity: conceptos.length === 1 ? 0.4 : 1 }} onClick={() => eliminarConcepto(i)} disabled={conceptos.length === 1}>
+              <button
+                style={styles.btnIcono}
+                onClick={() => eliminarConcepto(i)}
+              >
                 <Trash2 size={18} color="#A3A3A3" />
               </button>
             </div>

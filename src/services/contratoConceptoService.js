@@ -9,6 +9,9 @@ const contratoConceptoService = {
 
   eliminarConcepto: (id) =>
     masterAxios.delete(`/api/master/contratos-concepto/${id}`),
+
+  actualizarConcepto: (id, dto) =>
+    masterAxios.patch(`/api/master/contratos-concepto/${id}`, dto),
 };
 
 export default contratoConceptoService;

@@ -239,33 +239,25 @@ export default function VerEmpleadoPage() {
       {/* ── Sección 5: Conceptos ── */}
       <div style={styles.card}>
         <p style={styles.seccionTitulo}>Conceptos de Liquidación de Nómina Permanentes</p>
-        <p style={styles.textoDescripcion}>
-          Tenga en cuenta que los conceptos que seleccione e ingrese en el siguiente espacio, harán parte
-          de los cálculos internos para reportes de nómina que genere mes a mes o quincenalmente para dicho empleado.
-        </p>
-        {conceptos.map((c, i) => (
-          <div key={i} style={{ display: 'flex', gap: '20px', alignItems: 'flex-end', marginBottom: '16px' }}>
-            <div style={{ ...styles.campo, flex: 1 }}>
-              {i === 0 && <label style={styles.label}>Nombre concepto</label>}
-              <div style={styles.selectWrapper}>
-                <select disabled value={c.nombre} style={styles.selectRO}>
-                  <option value="">Seleccionar opción</option>
-                  <option value="beneficio">Beneficio o Extralegal</option>
-                  <option value="bonificacion">Bonificaciones Habituales</option>
-                  <option value="viaticos">Viáticos Permanentes</option>
-                  <option value="constituyen">Otros pagos que constituyen salario</option>
-                  <option value="no_constituyen">Otros pagos que no constituyen salario</option>
-                </select>
-                <ChevronDown size={16} color="#A3A3A3" style={styles.selectIcon} />
+        {conceptos.length === 0 ? (
+          <p style={{ color: '#A3A3A3', fontSize: '13px' }}>
+            Este empleado no tiene conceptos de nómina permanentes asignados.
+          </p>
+        ) : (
+          conceptos.map((c, i) => (
+            <div key={i} style={{ display: 'flex', gap: '20px', alignItems: 'flex-end', marginBottom: '16px' }}>
+              <div style={{ ...styles.campo, flex: 1 }}>
+                {i === 0 && <label style={styles.label}>Nombre concepto</label>}
+                <input readOnly value={c.conceptoNombre ?? ''} style={styles.inputRO} />
               </div>
+              <div style={{ ...styles.campo, flex: 1 }}>
+                {i === 0 && <label style={styles.label}>Valor neto (mensual)</label>}
+                <input readOnly value={c.valorFijo ?? ''} placeholder="Ingresar valor" style={styles.inputRO} />
+              </div>
+              <div style={{ width: '88px' }} />
             </div>
-            <div style={{ ...styles.campo, flex: 1 }}>
-              {i === 0 && <label style={styles.label}>Valor neto (mensual)</label>}
-              <input readOnly value={c.valor} placeholder="Ingresar valor" style={styles.inputRO} />
-            </div>
-            <div style={{ width: '88px' }} />
-          </div>
-        ))}
+          ))
+        )}
       </div>
 
       {/* ── Botones ── */}
