@@ -95,6 +95,7 @@ export default function EditarEmpleadoPage() {
   const [cargando, setCargando]           = useState(true);
   const [conceptos, setConceptos]         = useState([{ contratoConceptId: null, conceptoNominaId: '', valor: '' }]);
   const [conceptosOriginales, setConceptosOriginales] = useState([]);
+  const [conceptosNomina, setConceptosNomina] = useState([]);
 
   const [form, setForm] = useState({
     tipoDocumento:'', numeroDocumento:'', nombresEmpleado:'', apellidosEmpleado:'', direccion:'', cargo:'',
@@ -102,6 +103,47 @@ export default function EditarEmpleadoPage() {
     fechaRetiro:'', salario:'', auxTransporte:'', eps:'', fondoPensiones:'', arl:'',
     claseRiesgo:'', fondoCesantias:'', cajaCompensacion:'',
   });
+
+  const MAPA_TIPO_CONTRATO_INVERSO = {
+    'TERMINO_FIJO':                  'fijo',
+    'TERMINO_INDEFINIDO':            'indefinido',
+    'OBRA_LABOR':                    'obra',
+    'APRENDIZAJE':                   'aprendizaje',
+    'TEMPORAL_OCASIONAL_ACCIDENTAL': 'temporal',
+    'OTRO':                          'otro',
+  };
+
+  const MAPA_JORNADA_INVERSO = {
+    'UNICA':    'unica',
+    'TURNOS':   'turnos',
+    'ROTATIVA': 'rotativa',
+  };
+
+  const MAPA_TIPO_COTIZANTE_INVERSO = {
+    'DEPENDIENTE':                        '01',
+    'SERVICIO_DOMESTICO':                 '02',
+    'INDEPENDIENTE':                      '03',
+    'APRENDIZ_SENA_LECTIVA':              '12',
+    'APRENDIZ_SENA_PRODUCTIVA':           '19',
+    'ESTUDIANTE_LEY_789':                 '20',
+    'ESTUDIANTE_SOLO_ARL':                '23',
+    'COTIZANTE_EMERGENCIA_1':             '44',
+    'COTIZANTE_EMERGENCIA_2':             '45',
+    'TIEMPO_PARCIAL':                     '51',
+    'INDEPENDIENTE_PRESTACION_SERVICIOS': '59',
+  };
+
+  const MAPA_SUBTIPO_COTIZANTE_INVERSO = {
+    'CODIGO_0':  '0',
+    'CODIGO_1':  '1',
+    'CODIGO_3':  '3',
+    'CODIGO_4':  '4',
+    'CODIGO_5':  '5',
+    'CODIGO_6':  '6',
+    'CODIGO_9':  '9',
+    'CODIGO_11': '11',
+    'CODIGO_12': '12',
+  };
 
   const MAPA_CLASE_RIESGO_INVERSO = { 'CLASE_I':'I','CLASE_II':'II','CLASE_III':'III','CLASE_IV':'IV','CLASE_V':'V' };
 

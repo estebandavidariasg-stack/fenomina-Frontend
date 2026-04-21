@@ -1,15 +1,28 @@
 import { useState, useRef, useEffect } from 'react';
 import { Check } from 'lucide-react';
 
+const TRANSICIONES = {
+  'ACTIVO':   ['Inactivo'],
+  'INACTIVO': ['Activo'],
+  'RETIRADO': ['Activo'],
+};
+
 const ESTADOS = [
   { value: 'Inactivo', color: '#E65100' },
   { value: 'Activo',   color: '#0B662A' },
   { value: 'Retirado', color: '#C62828' },
 ];
 
+const styles = {
+  dropdown: {position: 'fixed', backgroundColor: '#fff', borderRadius: '12px', boxShadow: '0 4px 20px rgba(0,0,0,0.15)', zIndex: 1000, minWidth: '160px', padding: '8px 0', overflow: 'hidden'},
+  opcion:   { display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 20px', cursor: 'pointer' },
+};
+
 export default function EstadoDropdown({ estadoActual, onCambiar }) {
   const [abierto, setAbierto] = useState(false);
+  const [posicion, setPosicion] = useState({ top: 0, left: 0 });
   const ref = useRef(null);
+  const btnRef = useRef(null);
 
   useEffect(() => {
     const handleClick = (e) => {
@@ -19,12 +32,27 @@ export default function EstadoDropdown({ estadoActual, onCambiar }) {
     return () => document.removeEventListener('mousedown', handleClick);
   }, []);
 
+  const handleToggle = () => {
+    if (!abierto && btnRef.current) {
+      const rect = btnRef.current.getBoundingClientRect();
+      setPosicion({
+        top: rect.bottom + 4,
+        left: rect.left,
+      });
+    }
+    setAbierto(!abierto);
+  };
+
   const colorActual = ESTADOS.find(e => e.value === estadoActual)?.color ?? '#0B662A';
+  const opcionesPermitidas = ESTADOS.filter(e =>
+    TRANSICIONES[estadoActual]?.includes(e.value)
+  );
 
   return (
     <div ref={ref} style={{ position: 'relative', display: 'inline-block' }}>
       <button
-        onClick={() => setAbierto(!abierto)}
+        ref={btnRef}
+        onClick={handleToggle}
         style={{
           display: 'flex', alignItems: 'center', gap: '6px',
           backgroundColor: colorActual + '18',
@@ -40,23 +68,41 @@ export default function EstadoDropdown({ estadoActual, onCambiar }) {
       </button>
 
       {abierto && (
-        <div style={styles.dropdown}>
-          {ESTADOS.map((e) => (
+        <div style={{
+          position: 'fixed',
+          top: posicion.top,
+          left: posicion.left,
+          backgroundColor: '#fff',
+          borderRadius: '12px',
+          boxShadow: '0 4px 20px rgba(0,0,0,0.15)',
+          zIndex: 1000,
+          minWidth: '160px',
+          padding: '8px 0',
+          overflow: 'hidden',
+        }}>
+          {/* 
+          {/* Estado actual — solo lectura */}
+          <div style={{ ...styles.opcion, opacity: 0.5, cursor: 'default' }}>
+            <span style={{ color: colorActual, fontWeight: '600', fontSize: '14px' }}>
+              {estadoActual.charAt(0).toUpperCase() + estadoActual.slice(1).toLowerCase()}
+            </span>
+            <Check size={16} color="#272525" />
+          </div>
+          
+
+          {/* Opciones permitidas */}
+          {opcionesPermitidas.map((e) => (
             <div
               key={e.value}
-              style={{
-                ...styles.opcion,
-                backgroundColor: estadoActual === e.value ? e.color + '10' : 'transparent',
-              }}
+              style={styles.opcion}
               onClick={() => {
-                if (e.value !== estadoActual) onCambiar(e.value);
+                onCambiar(e.value);
                 setAbierto(false);
               }}
             >
               <span style={{ color: e.color, fontWeight: '600', fontSize: '14px' }}>
                 {e.value}
               </span>
-              {estadoActual === e.value && <Check size={16} color="#272525" />}
             </div>
           ))}
         </div>
@@ -64,8 +110,3 @@ export default function EstadoDropdown({ estadoActual, onCambiar }) {
     </div>
   );
 }
-
-const styles = {
-  dropdown: { position: 'absolute', top: '110%', left: 0, backgroundColor: '#fff', borderRadius: '12px', boxShadow: '0 4px 20px rgba(0,0,0,0.15)', zIndex: 100, minWidth: '160px', padding: '8px 0', overflow: 'hidden' },
-  opcion:   { display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 20px', cursor: 'pointer' },
-};

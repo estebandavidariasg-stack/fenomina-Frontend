@@ -31,7 +31,7 @@ export default function EditarEmpresaPage() {
         setEmpresa(data);
         setFotoPreview(
           data.logoEmpresaUrl
-            ? `${import.meta.env.VITE_MASTER_API_URL}${data.logoEmpresaUrl}`
+            ? `${import.meta.env.VITE_MASTER_API_URL}/api/master/files/logos/${data.logoEmpresaUrl}`
             : null
         );
         setForm({

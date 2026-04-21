@@ -10,9 +10,7 @@ import InicioPage from '../features/inicio/pages/InicioPage';
 import ProtectedRoute from './ProtectedRoute';
 import MainLayout from '../layouts/MainLayout';
 import EmpresasPage from '../features/auth/pages/empresas/EmpresasPage';
-import EmpresasModuloOpUno from '../features/auth/pages/empresas/EmpresasModuloOpUno';
-import EmpresasModuloOpDos from '../features/auth/pages/empresas/EmpresasModuloOpDos';
-import EmpresasModuloOpTres from '../features/auth/pages/empresas/EmpresasModuloOpTres';
+import EmpresaModulosPage from '../features/auth/pages/empresas/EmpresaModulosPage';
 import CrearEmpresaPage from '../features/auth/pages/empresas/CrearEmpresaPage';
 import InfoEmpresaPage from '../features/auth/pages/empresas/InfoEmpresaPage';
 import EditarEmpresaPage from '../features/auth/pages/empresas/EditarEmpresaPage';
@@ -74,12 +72,7 @@ export default function AppRouter() {
             {/* Empresas */}
             <Route path="/empresas" element={<EmpresasPage />} />
             <Route path="/empresas/crear" element={<CrearEmpresaPage />} />
-            <Route path="/empresas/:id" element={<EmpresasModuloOpUno />} />
-            <Route path="/empresas/:id/modulo-uno" element={<EmpresasModuloOpUno />} />
-            <Route path="/empresas/:id/modulo-dos" element={<EmpresasModuloOpDos />} />
-            <Route path="/empresas/:id/modulo-tres" element={<EmpresasModuloOpTres />} />
-
-            {/* Información y edición empresa */}
+            <Route path="/empresas/:id" element={<EmpresaModulosPage />} />
             <Route path="/empresas/:id/info" element={<InfoEmpresaPage />} />
             <Route path="/empresas/:id/info/editar" element={<EditarEmpresaPage />} />
 

@@ -36,6 +36,61 @@ export default function VerEmpleadoPage() {
   if (cargando) return <p>Cargando...</p>;
   if (!empleado) return <p>Empleado no encontrado.</p>;
 
+  const LABEL_TIPO_CONTRATO = {
+    'TERMINO_FIJO':                  'Término Fijo',
+    'TERMINO_INDEFINIDO':            'Término Indefinido',
+    'OBRA_LABOR':                    'Obra o Labor',
+    'APRENDIZAJE':                   'Aprendizaje',
+    'TEMPORAL_OCASIONAL_ACCIDENTAL': 'Temporal, Ocasional o Accidental',
+    'OTRO':                          'Otro',
+  };
+
+  const LABEL_JORNADA = {
+    'UNICA':    'Única',
+    'TURNOS':   'Turnos',
+    'ROTATIVA': 'Rotativa',
+  };
+
+  const LABEL_TIPO_COTIZANTE = {
+    'DEPENDIENTE':                        '01 - Dependiente',
+    'SERVICIO_DOMESTICO':                 '02 - Servicio Doméstico',
+    'INDEPENDIENTE':                      '03 - Independiente',
+    'APRENDIZ_SENA_LECTIVA':              '12 - Aprendiz SENA (Etapa Lectiva)',
+    'APRENDIZ_SENA_PRODUCTIVA':           '19 - Aprendiz SENA (Etapa Productiva)',
+    'ESTUDIANTE_LEY_789':                 '20 - Estudiantes (Régimen especial ley 789 de 2002)',
+    'ESTUDIANTE_SOLO_ARL':                '23 - Estudiantes aporte solo riesgos laborales',
+    'COTIZANTE_EMERGENCIA_1':             '44 - Cotizante dependiente de empleo de emergencia ≥ 1 mes',
+    'COTIZANTE_EMERGENCIA_2':             '45 - Cotizante dependiente de empleo de emergencia < 1 mes',
+    'TIEMPO_PARCIAL':                     '51 - Trabajador de tiempo parcial',
+    'INDEPENDIENTE_PRESTACION_SERVICIOS': '59 - Independiente con contrato de prestación de servicios',
+  };
+
+  const LABEL_SUBTIPO_COTIZANTE = {
+    'CODIGO_0':  '0 - Ninguno',
+    'CODIGO_1':  '1 - Dependiente Pensionado Activo',
+    'CODIGO_3':  '3 - Cotizante no Obligado a Cotización a Pensiones por Edad',
+    'CODIGO_4':  '4 - Con Requisitos Cumplidos para Pensión',
+    'CODIGO_5':  '5 - Cotizante con Devolución de Saldos',
+    'CODIGO_6':  '6 - Cotizante Perteneciente a Régimen Exceptuado',
+    'CODIGO_9':  '9 - Cotizante Pensionado con Mesada Superior a 25 SMMLV',
+    'CODIGO_11': '11 - Conductor de Vehículo Taxi',
+    'CODIGO_12': '12 - Conductor de Vehículo Taxi no obligado a cotizar pensión',
+  };
+
+  const LABEL_CLASE_RIESGO = {
+    'CLASE_I':   'I',
+    'CLASE_II':  'II',
+    'CLASE_III': 'III',
+    'CLASE_IV':  'IV',
+    'CLASE_V':   'V',
+  };
+
+  const formatearFecha = (fecha) => {
+    if (!fecha) return '—';
+    const [y, m, d] = fecha.split('-');
+    return `${d}/${m}/${y}`;
+  };
+
   return (
     <div style={styles.container}>
 
@@ -100,99 +155,35 @@ export default function VerEmpleadoPage() {
           </div>
           <div style={styles.campo}>
             <label style={styles.label}>Tipo de contrato</label>
-            <div style={styles.selectWrapper}>
-              <select disabled value={empleado.tipoContratoEmp} style={styles.selectRO}>
-                <option value="">Seleccionar opción</option>
-                <option value="fijo">Término Fijo</option>
-                <option value="indefinido">Término Indefinido</option>
-                <option value="obra">Obra o Labor</option>
-                <option value="aprendizaje">Aprendizaje</option>
-                <option value="temporal">Temporal, Ocasional o Accidental</option>
-                <option value="otro">Otro</option>
-              </select>
-              <ChevronDown size={16} color="#A3A3A3" style={styles.selectIcon} />
-            </div>
+            <input readOnly value={LABEL_TIPO_CONTRATO[empleado.tipoContratoEmp] ?? '—'} style={styles.inputRO} />
           </div>
           <div style={styles.campo}>
             <label style={styles.label}>Jornada</label>
-            <div style={styles.selectWrapper}>
-              <select disabled value={empleado.jornadaTrabajoEmp} style={styles.selectRO}>
-                <option value="">Seleccionar opción</option>
-                <option value="unica">Única</option>
-                <option value="turnos">Turnos</option>
-                <option value="rotativa">Rotativa</option>
-              </select>
-              <ChevronDown size={16} color="#A3A3A3" style={styles.selectIcon} />
-            </div>
+            <input readOnly value={LABEL_JORNADA[empleado.jornadaTrabajoEmp] ?? '—'} style={styles.inputRO} />
           </div>
         </div>
         <div style={{ ...styles.fila3, marginTop: '20px' }}>
           <div style={styles.campo}>
             <label style={styles.label}>Fecha de ingreso<span style={styles.req}>*</span></label>
-            <div style={styles.inputRO}>
-              <span style={{ color: empleado.fechaIngresoEmp ? '#272525' : '#A3A3A3', fontSize: '13px' }}>
-                {empleado.fechaIngresoEmp || 'DD/MM/YYYY'}
-              </span>
-              <Calendar size={16} color="#A3A3A3" />
-            </div>
+            <input readOnly value={formatearFecha(empleado.fechaIngresoEmp)} style={styles.inputRO} />
           </div>
           <div style={styles.campo}>
             <label style={styles.label}>Fecha de fin de contrato</label>
-            <div style={styles.inputRO}>
-              <span style={{ color: empleado.fechaFinContrato ? '#272525' : '#A3A3A3', fontSize: '13px' }}>
-                {empleado.fechaFinContrato || 'DD/MM/YYYY'}
-              </span>
-              <Calendar size={16} color="#A3A3A3" />
-            </div>
+            <input readOnly value={formatearFecha(empleado.fechaFinContrato)} style={styles.inputRO} />
           </div>
           <div style={styles.campo}>
             <label style={styles.label}>Tipo de cotizante</label>
-            <div style={styles.selectWrapper}>
-              <select disabled value={empleado.tipoCotizante} style={styles.selectRO}>
-                <option value="">Seleccionar opción</option>
-                <option value="01">01 - Dependiente</option>
-                <option value="02">02 - Servicio Doméstico</option>
-                <option value="03">03 - Independiente</option>
-                <option value="12">12 - Aprendiz SENA (Etapa Lectiva)</option>
-                <option value="19">19 - Apreniz SENA (Etapa Productiva)</option>
-                <option value="20">20 - Estudiantes (Régimen especial ley 789 de 2002)</option>
-                <option value="23">23 - Estudiantes aporte solo riesgos laborales</option>
-                <option value="44">44 - Cotizante dependiente de empleo de emergencia con duración mayor o igual a un mes</option>
-                <option value="45">45 - Cotizante dependiente de empleo de emergencia con duración menor a un mes</option>
-                <option value="51">51 - Trabajador de tiempo parcial</option>
-                <option value="59">59 - Independiente con contrato de prestación de servicios superior a 1 mes</option>
-              </select>
-              <ChevronDown size={16} color="#A3A3A3" style={styles.selectIcon} />
-            </div>
+            <input readOnly value={LABEL_TIPO_COTIZANTE[empleado.tipoCotizante] ?? '—'} style={styles.inputRO} />
           </div>
         </div>
         <div style={{ ...styles.fila3, marginTop: '20px' }}>
           <div style={styles.campo}>
             <label style={styles.label}>Subtipo de cotizante</label>
-            <div style={styles.selectWrapper}>
-              <select disabled value={empleado.subtipoCotizante} style={styles.selectRO}>
-                <option value="">Seleccionar opción</option>
-                <option value="0">0 - Ninguno</option>
-                <option value="1">1 - Dependiente Pensionado Activo</option>
-                <option value="3">3 - Cotizante no Obligado a Cotización a Pensiones por Edad</option>
-                <option value="4">4 - Con Requisitos Cumplidos para Pensión, Indemnización Sustitutiva o Devolución de Saldos</option>
-                <option value="5">5 - Cotizante con Devolución de Saldos</option>
-                <option value="6">6 - Cotizante Perteneciente a Régimen Exceptuado</option>
-                <option value="9">9 - Cotizante Pensinado con Mesada Superior a 25 SMMLV</option>
-                <option value="11">11 - Conductor de Vehículo Taxi</option>
-                <option value="12">12 - Conductor de Vehículo Taxi no obligado a cotizar pensión</option>
-              </select>
-              <ChevronDown size={16} color="#A3A3A3" style={styles.selectIcon} />
-            </div>
+            <input readOnly value={LABEL_SUBTIPO_COTIZANTE[empleado.subtipoCotizante] ?? '—'} style={styles.inputRO} />
           </div>
           <div style={styles.campo}>
             <label style={styles.label}>Fecha de retiro</label>
-            <div style={styles.inputRO}>
-              <span style={{ color: empleado.fechaRetiroEmp ? '#272525' : '#A3A3A3', fontSize: '13px' }}>
-                {empleado.fechaRetiroEmp || 'DD/MM/YYYY'}
-              </span>
-              <Calendar size={16} color="#A3A3A3" />
-            </div>
+            <input readOnly value={formatearFecha(empleado.fechaRetiroEmp)} style={styles.inputRO} />
           </div>
           <div />
         </div>
@@ -208,14 +199,7 @@ export default function VerEmpleadoPage() {
           </div>
           <div style={styles.campo}>
             <label style={styles.label}>Auxilio de transporte<span style={styles.req}>*</span></label>
-            <div style={styles.selectWrapper}>
-              <select disabled value={empleado.tieneAuxTransporte ? 'SI' : 'NO'} style={styles.selectRO}>
-                <option value="">Seleccionar opción</option>
-                <option value="SI">SI</option>
-                <option value="NO">NO</option>
-              </select>
-              <ChevronDown size={16} color="#A3A3A3" style={styles.selectIcon} />
-            </div>
+            <input readOnly value={empleado.tieneAuxTransporte ? 'SI' : 'NO'} style={styles.inputRO} />
           </div>
           <div />
         </div>
@@ -241,17 +225,7 @@ export default function VerEmpleadoPage() {
         <div style={{ ...styles.fila3, marginTop: '20px' }}>
           <div style={styles.campo}>
             <label style={styles.label}>Clase de Riesgo<span style={styles.req}>*</span></label>
-            <div style={styles.selectWrapper}>
-              <select disabled value={empleado.claseRiesgo} style={styles.selectRO}>
-                <option value="">Seleccionar opción</option>
-                <option value="I">I</option>
-                <option value="II">II</option>
-                <option value="III">III</option>
-                <option value="IV">IV</option>
-                <option value="V">V</option>
-              </select>
-              <ChevronDown size={16} color="#A3A3A3" style={styles.selectIcon} />
-            </div>
+            <input readOnly value={LABEL_CLASE_RIESGO[empleado.claseRiesgo] ?? '—'} style={styles.inputRO} />
           </div>
           <div style={styles.campo}>
             <label style={styles.label}>Fondo de cesantías<span style={styles.req}>*</span></label>
@@ -312,18 +286,22 @@ export default function VerEmpleadoPage() {
         >
           Regresar
         </button>
-        <button
-          style={{
-            ...styles.btnEditar,
-            background: hoverEditar ? 'linear-gradient(135deg, #0B662A, #1a9e45)' : '#0B662A',
-            transition: 'background 0.3s ease',
-          }}
-          onMouseEnter={() => setHoverEditar(true)}
-          onMouseLeave={() => setHoverEditar(false)}
-          onClick={() => navigate(`/empresas/${id}/empleados/${empleadoId}/editar`)}
-        >
-          Editar Información
-        </button>
+        
+        {usuario?.rolUsuario !== 'CLIENTE_EMPRESA' && usuario?.rolUsuario !== 'AUDITOR' && (
+          <button
+            style={{
+              ...styles.btnEditar,
+              background: hoverEditar ? 'linear-gradient(135deg, #0B662A, #1a9e45)' : '#0B662A',
+              transition: 'background 0.3s ease',
+            }}
+            onMouseEnter={() => setHoverEditar(true)}
+            onMouseLeave={() => setHoverEditar(false)}
+            onClick={() => navigate(`/empresas/${id}/empleados/${empleadoId}/editar`)}
+          >
+            Editar Información
+          </button>
+        )}
+        
       </div>
 
     </div>

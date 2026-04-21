@@ -40,7 +40,11 @@ export default function EditarUsuarioPage() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setForm({ ...form, [name]: value });
+    const nuevoForm = { ...form, [name]: value };
+    if (name === 'rolUsuario' && value !== 'CLIENTE_EMPRESA') {
+      nuevoForm.fkIdEmpresa = '';
+    }
+    setForm(nuevoForm);
     setErrores({ ...errores, [name]: '' });
     setErrorGlobal('');
   };
@@ -51,6 +55,9 @@ export default function EditarUsuarioPage() {
     if (!form.apellidosUsuario) e.apellidosUsuario = 'Los apellidos son obligatorios.';
     if (!form.cargoUsuario) e.cargoUsuario = 'El cargo es obligatorio.';
     if (!form.rolUsuario) e.rolUsuario = 'El rol es obligatorio.';
+    if (form.rolUsuario === 'CLIENTE_EMPRESA' && !form.fkIdEmpresa) {
+      e.fkIdEmpresa = 'Debes seleccionar una empresa para este rol.';
+    }
     return e;
   };
 
@@ -131,30 +138,34 @@ export default function EditarUsuarioPage() {
             </select>
             {errores.rolUsuario && <span style={styles.errorTexto}>{errores.rolUsuario}</span>}
           </div>
-          <div>
-            <label style={styles.label}>Empresa (opcional)</label>
-            <select
-              name="fkIdEmpresa"
-              value={form.fkIdEmpresa}
-              onChange={handleChange}
-              style={{
-                ...styles.input,
-                borderColor: errores.fkIdEmpresa ? '#e53e3e' : '#D0D0D0',
-                color: form.fkIdEmpresa ? '#272525' : '#A3A3A3',
-              }}
-            >
-              <option value="">Dejar vacío para acceso total</option>
-              {cargandoEmpresas
-                ? <option disabled>Cargando empresas...</option>
-                : empresas.map(e => (
-                    <option key={e.empresaId} value={e.empresaId}>
-                      {e.nombreEmpresa}
-                    </option>
-                  ))
-              }
-            </select>
-            {errores.fkIdEmpresa && <span style={styles.errorTexto}>{errores.fkIdEmpresa}</span>}
-          </div>
+
+          {form.rolUsuario === 'CLIENTE_EMPRESA' && (
+            <div>
+              <label style={styles.label}>Empresa<span style={{ color: '#e53e3e' }}>*</span></label>
+              <select
+                name="fkIdEmpresa"
+                value={form.fkIdEmpresa}
+                onChange={handleChange}
+                style={{
+                  ...styles.input,
+                  borderColor: errores.fkIdEmpresa ? '#e53e3e' : '#D0D0D0',
+                  color: form.fkIdEmpresa ? '#272525' : '#A3A3A3',
+                }}
+              >
+                <option value="">Seleccionar empresa</option>
+                {cargandoEmpresas
+                  ? <option disabled>Cargando empresas...</option>
+                  : empresas.map(e => (
+                      <option key={e.empresaId} value={e.empresaId}>
+                        {e.nombreEmpresa}
+                      </option>
+                    ))
+                }
+              </select>
+              {errores.fkIdEmpresa && <span style={styles.errorTexto}>{errores.fkIdEmpresa}</span>}
+            </div>
+          )}
+
         </div>
       </div>
 

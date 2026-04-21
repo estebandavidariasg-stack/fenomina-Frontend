@@ -90,8 +90,8 @@ export default function InfoEmpresaPage() {
           <p style={styles.seccionTitulo}>Logo Empresa</p>
           <div style={styles.logoBox}>
             <div style={styles.fotoCirculo}>
-              {empresa.logo
-                ? <img src={`${import.meta.env.VITE_MASTER_API_URL}${empresa.logoEmpresaUrl}`} alt="logo" style={styles.fotoImg} />
+              {empresa.logoEmpresaUrl
+                ? <img src={`${import.meta.env.VITE_MASTER_API_URL}/api/master/files/logos/${empresa.logoEmpresaUrl}`} alt="logo" style={styles.fotoImg} />
                 : <Building2 size={32} color="#A3A3A3" />
               }
             </div>
@@ -146,18 +146,23 @@ export default function InfoEmpresaPage() {
         >
           Regresar
         </button>
-        <button
-          style={{
-            ...styles.btnEditar,
-            background: hoverEditar ? 'linear-gradient(135deg, #0B662A, #1a9e45)' : '#0B662A',
-            transition: 'background 0.3s ease',
-          }}
-          onMouseEnter={() => setHoverEditar(true)}
-          onMouseLeave={() => setHoverEditar(false)}
-          onClick={() => navigate(`/empresas/${id}/info/editar`)}
-        >
-          Editar Información
-        </button>
+
+        {usuario?.rolUsuario !== 'CLIENTE_EMPRESA' && usuario?.rolUsuario !== 'AUDITOR' && (
+          <button
+            style={{
+              ...styles.btnEditar,
+              background: hoverEditar
+                ? 'linear-gradient(135deg, #0B662A, #1a9e45)'
+                : '#0B662A',
+              transition: 'background 0.3s ease',
+            }}
+            onMouseEnter={() => setHoverEditar(true)}
+            onMouseLeave={() => setHoverEditar(false)}
+            onClick={() => navigate(`/empresas/${id}/info/editar`)}
+          >
+            Editar Información
+          </button>
+        )}
       </div>
 
     </div>

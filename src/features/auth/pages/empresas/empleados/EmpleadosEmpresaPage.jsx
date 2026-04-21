@@ -40,9 +40,11 @@ export default function EmpleadosEmpresaPage() {
     setModalEstado(true);
   };
 
+  const soloLectura = usuario?.rolUsuario === 'CLIENTE_EMPRESA' || usuario?.rolUsuario === 'AUDITOR';
+
   const handleConfirmarEstado = async () => {
     try {
-      await empleadosService.cambiarEstado(empleadoSeleccionado.empleadoId, nuevoEstado);
+      await empleadosService.cambiarEstado(empleadoSeleccionado.empleadoId, nuevoEstado.toUpperCase());
       setModalEstado(false);
       setModal('exito');
       recargar();
@@ -141,22 +143,23 @@ export default function EmpleadosEmpresaPage() {
         </div>
       </div>
 
-      {/* Añadir nuevo empleado */}
-      <div style={styles.addBar}>
-        <span style={styles.addLabel}>Añadir nuevo empleado</span>
-        <button
-          style={{
-            ...styles.btnCrear,
-            background: hoverCrear ? 'linear-gradient(135deg, #0B662A, #1a9e45)' : '#0B662A',
-            transition: 'background 0.3s ease',
-          }}
-          onMouseEnter={() => setHoverCrear(true)}
-          onMouseLeave={() => setHoverCrear(false)}
-          onClick={() => navigate(`/empresas/${id}/empleados/crear`)}
-        >
-          Crear empleado
-        </button>
-      </div>
+      {usuario?.rolUsuario !== 'CLIENTE_EMPRESA' && usuario?.rolUsuario !== 'AUDITOR' && (
+        <div style={styles.addBar}>
+          <span style={styles.addLabel}>Añadir nuevo empleado</span>
+          <button
+            style={{
+              ...styles.btnCrear,
+              background: hoverCrear ? 'linear-gradient(135deg, #0B662A, #1a9e45)' : '#0B662A',
+              transition: 'background 0.3s ease',
+            }}
+            onMouseEnter={() => setHoverCrear(true)}
+            onMouseLeave={() => setHoverCrear(false)}
+            onClick={() => navigate(`/empresas/${id}/empleados/crear`)}
+          >
+            Crear empleado
+          </button>
+        </div>
+      )}
 
       {/* Tabs */}
       <div style={styles.tabsBox}>
@@ -180,16 +183,16 @@ export default function EmpleadosEmpresaPage() {
               <tr>
                 {['#', 'Nombre(s)', 'Apellidos', 'Fecha de ingreso', 'Número de documento',
                   'Salario mensual', 'Aux. de transporte', 'EPS', 'Fondo de pensión',
-                  'ARL', 'Caja de compensación', 'Estado', 'Acciones'].map((col) => (
+                  'ARL', 'Caja de compensación', ...(!soloLectura ? ['Estado'] : []), 'Acciones'].map((col) => (
                   <th key={col} style={styles.th}>{col}</th>
                 ))}
               </tr>
             </thead>
             <tbody>
               {cargando ? (
-                <tr><td colSpan={13} style={{ textAlign: 'center', padding: '20px' }}>Cargando...</td></tr>
-              ) : empleadosPagina.length === 0 ? (
-                <tr><td colSpan={13} style={{ textAlign: 'center', padding: '20px', color: '#A3A3A3' }}>Sin resultados</td></tr>
+                <tr><td colSpan={soloLectura ? 12 : 13} style={{ textAlign: 'center', padding: '20px' }}>Cargando...</td></tr>
+              ) : empleados.length === 0 ? (
+                <tr><td colSpan={soloLectura ? 12 : 13} style={{ textAlign: 'center', padding: '20px', color: '#A3A3A3' }}>Sin resultados</td></tr>
               ) : (
                 empleadosPagina.map((emp, index) => (
                   <tr key={emp.empleadoId} style={index % 2 === 0 ? styles.trPar : styles.trImpar}>
@@ -204,12 +207,16 @@ export default function EmpleadosEmpresaPage() {
                     <td style={styles.td}>{emp.fondoPensionEmp}</td>
                     <td style={styles.td}>{emp.nombreArl}</td>
                     <td style={styles.td}>{emp.cajaCompensacion}</td>
-                    <td style={styles.td}>
-                      <EstadoDropdown
-                        estadoActual={emp.estadoEmp}
-                        onCambiar={(nuevoE) => handleCambiarEstado(emp, nuevoE)}
-                      />
-                    </td>
+
+                    {!soloLectura && (
+                      <td style={styles.td}>
+                        <EstadoDropdown
+                          estadoActual={emp.estadoEmp}
+                          onCambiar={(nuevoE) => handleCambiarEstado(emp, nuevoE)}
+                        />
+                      </td>
+                    )}
+
                     <td style={styles.td}>
                       <button style={styles.btnVer} onClick={() => navigate(`/empresas/${id}/empleados/${emp.empleadoId}`)}>
                         <Eye size={16} color="#0B662A" />
