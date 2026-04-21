@@ -143,9 +143,7 @@ export default function NovedadesPage() {
 
   const [modal, setModal]                         = useState(null);
   const [confirmarGuardar, setConfirmarGuardar]   = useState(false);
-  const [confirmarBorrador, setConfirmarBorrador] = useState(false);
   const [hoverGuardar, setHoverGuardar]           = useState(false);
-  const [hoverBorrador, setHoverBorrador]         = useState(false);
   const [hoverRegresar, setHoverRegresar]         = useState(false);
 
   const updateFila = (setter, arr, i, campo, valor) => {
@@ -155,7 +153,7 @@ export default function NovedadesPage() {
   const removeFila = (setter, arr, i) => arr.length > 1 && setter(arr.filter((_, idx) => idx !== i));
 
   const campo = (label, children, i) => (
-    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '6px' }}>
+    <div style={{ flex: 1, minWidth: '160px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
       {i === 0 && <label style={styles.label}>{label}</label>}
       {children}
     </div>
@@ -375,14 +373,7 @@ export default function NovedadesPage() {
           onMouseEnter={() => setHoverGuardar(true)} onMouseLeave={() => setHoverGuardar(false)}
           onClick={() => setConfirmarGuardar(true)}
         >
-          Guardar y Cerrar Proceso
-        </button>
-        <button
-          style={{ ...styles.btnBorrador, background: hoverBorrador ? 'linear-gradient(135deg, #f0f0f0, #e0e0e0)' : '#fff', transition: 'background 0.3s ease' }}
-          onMouseEnter={() => setHoverBorrador(true)} onMouseLeave={() => setHoverBorrador(false)}
-          onClick={() => setConfirmarBorrador(true)}
-        >
-          Guardar Borrador
+          Guardar
         </button>
         <button
           style={{ ...styles.btnRegresar, background: hoverRegresar ? 'linear-gradient(135deg, #f0f0f0, #e0e0e0)' : '#fff', transition: 'background 0.3s ease' }}
@@ -399,13 +390,6 @@ export default function NovedadesPage() {
         onConfirmar={() => { setConfirmarGuardar(false); setModal('exito'); }}
         titulo="¿Deseas guardar y cerrar el proceso?"
         descripcion="Una vez confirmes, el proceso será cerrado y los datos guardados definitivamente."
-      />
-      <ConfirmarCambiosModal
-        visible={confirmarBorrador}
-        onCancelar={() => setConfirmarBorrador(false)}
-        onConfirmar={() => { setConfirmarBorrador(false); setModal('exito'); }}
-        titulo="¿Deseas guardar como borrador?"
-        descripcion="Los datos serán guardados temporalmente y podrás continuar editando más tarde."
       />
       <MensajeModal tipo={modal} onClose={() => { setModal(null); if (modal === 'exito') navigate(-1); }} />
 
@@ -430,12 +414,12 @@ const styles = {
   input:           { border: '1px solid #D0D0D0', borderRadius: '8px', padding: '11px 16px', fontSize: '13px', fontFamily: 'Nunito, sans-serif', outline: 'none', color: '#272525', width: '100%', boxSizing: 'border-box' },
   select:          { width: '100%', border: '1px solid #D0D0D0', borderRadius: '8px', padding: '11px 36px 11px 16px', fontSize: '13px', fontFamily: 'Nunito, sans-serif', outline: 'none', appearance: 'none', WebkitAppearance: 'none', MozAppearance: 'none', backgroundColor: '#fff', color: '#272525', cursor: 'pointer', backgroundImage: 'none', boxSizing: 'border-box' },
   selectIcon:      { position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none' },
-  filaRow:         { display: 'flex', gap: '16px', alignItems: 'flex-end', marginBottom: '16px' },
+  filaRow:         { display: 'flex', gap: '16px', alignItems: 'flex-end', marginBottom: '16px', flexWrap: 'wrap' },
   iconosRow:       { display: 'flex', gap: '8px', flexShrink: 0 },
   btnIcono:        { width: '36px', height: '36px', borderRadius: '8px', border: '1px solid #D0D0D0', backgroundColor: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', flexShrink: 0 },
   radioLabel:      { display: 'flex', alignItems: 'center', gap: '6px', fontSize: '13px', color: '#272525', cursor: 'pointer' },
   radio:           { accentColor: '#0B662A', width: '16px', height: '16px', cursor: 'pointer' },
-  botonesRow:      { display: 'flex', gap: '16px', justifyContent: 'center', paddingBottom: '16px' },
+  botonesRow:      { display: 'flex', gap: '16px', justifyContent: 'center', paddingBottom: '16px', flexWrap: 'wrap' },
   btnGuardarCerrar:{ color: '#fff', border: 'none', borderRadius: '8px', padding: '14px 40px', fontSize: '14px', fontWeight: '700', fontFamily: 'Nunito, sans-serif', cursor: 'pointer' },
   btnBorrador:     { color: '#272525', border: '1px solid #D0D0D0', borderRadius: '8px', padding: '14px 40px', fontSize: '14px', fontWeight: '700', fontFamily: 'Nunito, sans-serif', cursor: 'pointer' },
   btnRegresar:     { color: '#272525', border: '1px solid #D0D0D0', borderRadius: '8px', padding: '14px 40px', fontSize: '14px', fontWeight: '700', fontFamily: 'Nunito, sans-serif', cursor: 'pointer' },

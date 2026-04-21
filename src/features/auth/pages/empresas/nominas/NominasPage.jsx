@@ -1,23 +1,23 @@
 import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAuthStore } from '../../../../../store/authStore';
-import { FileText, Search, ChevronLeft, ChevronDown , UserRound} from 'lucide-react';
+import { FileText, Search, ChevronLeft, ChevronDown, UserRound, Pencil, Trash2, Upload } from 'lucide-react';
 import ConfirmarCambiosModal from '../../../../../components/ConfirmarCambiosModal';
 import MensajeModal from '../../../../../components/MensajeModal';
 
 
-const MOCK_NOMINAS = [
-  { id: 1,  nombres: 'Pepito',         apellidos: 'Perez',               fechaIngreso: '30/01/2023', documento: '10528967', valorNomina: '1.750.095', periodoLiq: '2025-06-15', estado: 'Borrador', fechaProceso: '2025-06-09' },
-  { id: 2,  nombres: 'Carlos Andres',  apellidos: 'Rodriguez Ochoa',     fechaIngreso: '30/12/2023', documento: '10528967', valorNomina: '1.750.095', periodoLiq: '2025-06-15', estado: 'Borrador', fechaProceso: '2025-06-07' },
-  { id: 3,  nombres: 'Alejandra Maria',apellidos: 'Anibal Leon',          fechaIngreso: '30/11/2022', documento: '10528967', valorNomina: '1.750.095', periodoLiq: '2025-06-15', estado: 'Borrador', fechaProceso: '2025-06-09' },
-  { id: 4,  nombres: 'Carlos Alberto', apellidos: 'Domingo Rodriguez',    fechaIngreso: '30/01/2023', documento: '10528967', valorNomina: '1.750.095', periodoLiq: '2025-06-15', estado: 'Borrador', fechaProceso: '2025-06-07' },
-  { id: 5,  nombres: 'Samuel',         apellidos: 'Martinez Ramos',       fechaIngreso: '30/01/2023', documento: '10528967', valorNomina: '1.750.095', periodoLiq: '2025-06-15', estado: 'Borrador', fechaProceso: '2025-06-09' },
-  { id: 6,  nombres: 'Maria Alexandra',apellidos: 'Caicedo Jimenez',      fechaIngreso: '30/01/2023', documento: '10528967', valorNomina: '1.750.095', periodoLiq: '2025-06-15', estado: 'Borrador', fechaProceso: '2025-06-09' },
-  { id: 7,  nombres: 'Ramiro',         apellidos: 'Martinez Rativa',      fechaIngreso: '30/01/2023', documento: '10528967', valorNomina: '1.750.095', periodoLiq: '2025-06-15', estado: 'Borrador', fechaProceso: '2025-06-09' },
-  { id: 8,  nombres: 'Andres',         apellidos: 'Jimenez Ochoa',        fechaIngreso: '30/01/2023', documento: '10528967', valorNomina: '1.750.095', periodoLiq: '2025-06-15', estado: 'Borrador', fechaProceso: '2025-06-09' },
-  { id: 9,  nombres: 'Carlos Andres',  apellidos: 'Rubio Giraldo',        fechaIngreso: '30/01/2023', documento: '10528967', valorNomina: '1.750.095', periodoLiq: '2025-06-15', estado: 'Borrador', fechaProceso: '2025-06-09' },
-  { id: 10, nombres: 'Yeimy',          apellidos: 'Castañeda Rodriguez',  fechaIngreso: '30/01/2023', documento: '10528967', valorNomina: '1.750.095', periodoLiq: '2025-06-15', estado: 'Borrador', fechaProceso: '2025-06-09' },
-  { id: 11, nombres: 'Ana Maria',      apellidos: 'Rodriguez Rodriguez',  fechaIngreso: '30/01/2023', documento: '10528967', valorNomina: '1.750.095', periodoLiq: '2025-06-15', estado: 'Borrador', fechaProceso: '2025-06-09' },
+const MOCK_PERIODOS = [
+  { id: 1,  periodo: '2025-01-15', empleadosIncluidos: 15, totalNeto: 224000, fechaCreacion: '2025-01-20', estado: 'Borrador' },
+  { id: 2,  periodo: '2025-01-15', empleadosIncluidos: 13, totalNeto: 224000, fechaCreacion: '2025-01-20', estado: 'Borrador' },
+  { id: 3,  periodo: '2025-01-15', empleadosIncluidos: 14, totalNeto: 224000, fechaCreacion: '2025-01-21', estado: 'Cerrado' },
+  { id: 4,  periodo: '2025-01-15', empleadosIncluidos: 14, totalNeto: 224000, fechaCreacion: '2025-01-21', estado: 'Borrador' },
+  { id: 5,  periodo: '2025-01-15', empleadosIncluidos: 14, totalNeto: 224000, fechaCreacion: '2025-01-22', estado: 'Pagado' },
+  { id: 6,  periodo: '2025-01-30', empleadosIncluidos: 15, totalNeto: 224000, fechaCreacion: '2025-02-03', estado: 'Borrador' },
+  { id: 7,  periodo: '2025-01-30', empleadosIncluidos: 15, totalNeto: 224000, fechaCreacion: '2025-02-03', estado: 'Borrador' },
+  { id: 8,  periodo: '2025-01-30', empleadosIncluidos: 15, totalNeto: 224000, fechaCreacion: '2025-02-04', estado: 'Cerrado' },
+  { id: 9,  periodo: '2025-01-30', empleadosIncluidos: 15, totalNeto: 224000, fechaCreacion: '2025-02-04', estado: 'Borrador' },
+  { id: 10, periodo: '2025-01-30', empleadosIncluidos: 15, totalNeto: 224000, fechaCreacion: '2025-02-05', estado: 'Pendiente por pagar' },
+  { id: 11, periodo: '2025-01-30', empleadosIncluidos: 15, totalNeto: 224000, fechaCreacion: '2025-02-05', estado: 'Borrador' },
 ];
 
 const TABS = ['Borrador', 'Cerrado', 'Pendiente por pagar', 'Pagado', 'Anulado'];
@@ -27,8 +27,13 @@ const OPCIONES_POR_ESTADO = {
   'Borrador':            ['Borrador', 'Cerrado', 'Anulado'],
   'Cerrado':             ['Cerrado', 'Borrador', 'Anulado'],
   'Pendiente por pagar': ['Pendiente por pagar', 'Pagado', 'Anulado'],
-  'Pagado':              ['Pagado', 'Borrador', 'Cerrado', 'Anulado'],
-  'Anulado':             ['Anulado', 'Borrador', 'Cerrado'],
+  'Pagado':              ['Pagado', 'Anulado'],
+  'Anulado':             ['Anulado'],
+};
+
+const formatMiles = (valor) => {
+  const str = String(Math.round(valor));
+  return '$' + str.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
 };
 
 function EstadoSelect({ valor, onChange }) {
@@ -57,40 +62,58 @@ export default function NominasPage() {
   const { id }      = useParams();
   const { usuario } = useAuthStore();
 
-  const inicial = usuario?.nombresUsuario?.charAt(0).toUpperCase() ?? 'U';
-  const nombre  = `${usuario?.nombresUsuario ?? ''} ${usuario?.apellidosUsuario ?? ''}`.trim();
-  const cargo   = usuario?.cargoUsuario ?? '';
+  const nombre = `${usuario?.nombresUsuario ?? ''} ${usuario?.apellidosUsuario ?? ''}`.trim();
+  const cargo  = usuario?.cargoUsuario ?? '';
 
-  const [tab, setTab]             = useState('Borrador');
-  const [busqueda, setBusqueda]   = useState('');
-  const [pagina, setPagina]       = useState(0);
-  const [nominas, setNominas]     = useState(MOCK_NOMINAS);
-  const [modal, setModal]         = useState(null);
-  const [confirmarEstado, setConfirmarEstado] = useState(false);
-  const [cambioEstado, setCambioEstado]       = useState({ nominaId: null, nuevoEstado: null });
-  const [hoverLiquidar, setHoverLiquidar]     = useState(false);
-  const [fechaFiltro, setFechaFiltro]         = useState('');
+  const [tab, setTab]                           = useState('Borrador');
+  const [busqueda, setBusqueda]                 = useState('');
+  const [pagina, setPagina]                     = useState(0);
+  const [periodos, setPeriodos]                 = useState(MOCK_PERIODOS);
+  const [modal, setModal]                       = useState(null);
+  const [confirmarEstado, setConfirmarEstado]     = useState(false);
+  const [confirmarEliminar, setConfirmarEliminar] = useState(false);
+  const [confirmarAnulado, setConfirmarAnulado]   = useState(false);
+  const [cambioEstado, setCambioEstado]         = useState({ periodoId: null, nuevoEstado: null });
+  const [periodoEliminar, setPeriodoEliminar]   = useState(null);
+  const [hoverLiquidar, setHoverLiquidar]       = useState(false);
 
-  const nominasFiltradas = nominas.filter(n =>
-    n.estado === tab &&
-    (n.nombres.toLowerCase().includes(busqueda.toLowerCase()) ||
-     n.apellidos.toLowerCase().includes(busqueda.toLowerCase()) ||
-     n.documento.includes(busqueda))
+  const periodosFiltrados = periodos.filter(p =>
+    !p.deletedAt &&
+    p.estado === tab &&
+    p.periodo.includes(busqueda)
   );
 
-  const totalPaginas  = Math.max(1, Math.ceil(nominasFiltradas.length / PAGE_SIZE));
-  const nominasPagina = nominasFiltradas.slice(pagina * PAGE_SIZE, pagina * PAGE_SIZE + PAGE_SIZE);
+  const totalPaginas   = Math.max(1, Math.ceil(periodosFiltrados.length / PAGE_SIZE));
+  const periodosPagina = periodosFiltrados.slice(pagina * PAGE_SIZE, pagina * PAGE_SIZE + PAGE_SIZE);
 
-  const handleEstadoChange = (nominaId, nuevoEstado) => {
-    setCambioEstado({ nominaId, nuevoEstado });
-    setConfirmarEstado(true);
+  const handleEstadoChange = (periodoId, nuevoEstado) => {
+    setCambioEstado({ periodoId, nuevoEstado });
+    if (nuevoEstado === 'Anulado') {
+      setConfirmarAnulado(true);
+    } else {
+      setConfirmarEstado(true);
+    }
   };
 
   const handleConfirmarEstado = () => {
-    setNominas(nominas.map(n =>
-      n.id === cambioEstado.nominaId ? { ...n, estado: cambioEstado.nuevoEstado } : n
+    setPeriodos(periodos.map(p =>
+      p.id === cambioEstado.periodoId ? { ...p, estado: cambioEstado.nuevoEstado } : p
     ));
     setConfirmarEstado(false);
+    setModal('exito');
+  };
+
+  const handleEliminar = (periodo) => {
+    setPeriodoEliminar(periodo);
+    setConfirmarEliminar(true);
+  };
+
+  const handleConfirmarEliminar = () => {
+    const ahora = new Date().toISOString();
+    setPeriodos(periodos.map(p =>
+      p.id === periodoEliminar.id ? { ...p, deletedAt: ahora } : p
+    ));
+    setConfirmarEliminar(false);
     setModal('exito');
   };
 
@@ -123,11 +146,11 @@ export default function NominasPage() {
         <span>Volver</span>
       </button>
 
-      {/* Toolbar en bloque blanco */}
+      {/* Toolbar */}
       <div style={styles.toolbarCard}>
         <div>
-          <p style={styles.totalNum}>{nominas.length}</p>
-          <p style={styles.totalLabel}>Total nóminas</p>
+          <p style={styles.totalNum}>{periodosFiltrados.length}</p>
+          <p style={styles.totalLabel}>Total reportes</p>
         </div>
         <div style={styles.filtrosBox}>
           <div style={styles.searchBox}>
@@ -139,12 +162,6 @@ export default function NominasPage() {
               onChange={(e) => { setBusqueda(e.target.value); setPagina(0); }}
             />
           </div>
-          <input
-            type="date"
-            value={fechaFiltro}
-            onChange={(e) => setFechaFiltro(e.target.value)}
-            style={styles.dateInput}
-          />
         </div>
       </div>
 
@@ -159,9 +176,9 @@ export default function NominasPage() {
           }}
           onMouseEnter={() => setHoverLiquidar(true)}
           onMouseLeave={() => setHoverLiquidar(false)}
-          onClick={() => navigate(`/empresas/${id}/nominas/liquidar`)}
+          onClick={() => navigate(`/empresas/${id}/nominas/generar-reporte`)}
         >
-          Liquidar nóminas
+          Nuevo proceso de liquidación
         </button>
       </div>
 
@@ -180,34 +197,74 @@ export default function NominasPage() {
 
       {/* Tabla */}
       <div style={styles.card}>
-        <p style={styles.tableTitle}>Todas las Liquidaciones de Nóminas (Histórico)</p>
+        <p style={styles.tableTitle}>Histórico Total de Nóminas por Periodo</p>
         <div style={styles.tableWrapper}>
           <table style={styles.table}>
             <thead>
               <tr>
-                {['Nombre(s)', 'Apellidos', 'Fecha de ingreso', 'Número de documento',
-                  'Valor última nómina', 'Periodo de liq. de última nómina',
-                  'Estado del proceso', 'Fecha proceso'].map((col) => (
-                  <th key={col} style={styles.th}>{col}</th>
-                ))}
+                <th style={styles.th}>Periodo</th>
+                <th style={styles.th}>Empleados incluidos</th>
+                <th style={styles.th}>Total neto</th>
+                <th style={styles.th}>Fecha de creación proceso</th>
+                <th style={styles.th}>Estado</th>
+                {(tab === 'Borrador' || tab === 'Cerrado') && (
+                  <th style={styles.th}>Acciones</th>
+                )}
               </tr>
             </thead>
             <tbody>
-              {nominasPagina.length === 0 ? (
-                <tr><td colSpan={8} style={{ textAlign: 'center', padding: '20px', color: '#A3A3A3' }}>Sin resultados</td></tr>
+              {periodosPagina.length === 0 ? (
+                <tr>
+                  <td colSpan={['Borrador', 'Cerrado'].includes(tab) ? 6 : 5} style={{ textAlign: 'center', padding: '20px', color: '#A3A3A3' }}>
+                    Sin resultados
+                  </td>
+                </tr>
               ) : (
-                nominasPagina.map((n, index) => (
-                  <tr key={n.id} style={index % 2 === 0 ? styles.trPar : styles.trImpar}>
-                    <td style={styles.td}>{n.nombres}</td>
-                    <td style={styles.td}>{n.apellidos}</td>
-                    <td style={styles.td}>{n.fechaIngreso}</td>
-                    <td style={styles.td}>{n.documento}</td>
-                    <td style={styles.td}>{n.valorNomina}</td>
-                    <td style={styles.td}>{n.periodoLiq}</td>
+                periodosPagina.map((p, index) => (
+                  <tr key={p.id} style={index % 2 === 0 ? styles.trPar : styles.trImpar}>
+                    <td style={styles.td}>{p.periodo}</td>
+                    <td style={styles.td}>{p.empleadosIncluidos}</td>
+                    <td style={styles.td}>{formatMiles(p.totalNeto)}</td>
+                    <td style={styles.td}>{p.fechaCreacion}</td>
                     <td style={styles.td}>
-                      <EstadoSelect valor={n.estado} onChange={(v) => handleEstadoChange(n.id, v)} />
+                      {p.estado === 'Anulado'
+                        ? <span style={styles.estadoTexto}>{p.estado}</span>
+                        : <EstadoSelect valor={p.estado} onChange={(v) => handleEstadoChange(p.id, v)} />
+                      }
                     </td>
-                    <td style={styles.td}>{n.fechaProceso}</td>
+                    {['Borrador', 'Cerrado'].includes(tab) && (
+                      <td style={styles.td}>
+                        <div style={{ display: 'flex', gap: '10px', justifyContent: 'center', alignItems: 'center' }}>
+                          {p.estado === 'Borrador' && (
+                            <>
+                              <button
+                                style={styles.iconBtn}
+                                onClick={() => navigate(`/empresas/${id}/nominas/${p.id}/desprendibles`)}
+                                title="Editar"
+                              >
+                                <Pencil size={16} color="#0B662A" />
+                              </button>
+                              <button
+                                style={styles.iconBtn}
+                                onClick={() => handleEliminar(p)}
+                                title="Eliminar"
+                              >
+                                <Trash2 size={16} color="#E53E3E" />
+                              </button>
+                            </>
+                          )}
+                          {p.estado === 'Cerrado' && (
+                            <button
+                              style={styles.iconBtn}
+                              title="Liquidar"
+                              onClick={() => navigate(`/empresas/${id}/nominas/${p.id}/liquidar`)}
+                            >
+                              <Upload size={16} color="#0B662A" />
+                            </button>
+                          )}
+                        </div>
+                      </td>
+                    )}
                   </tr>
                 ))
               )}
@@ -245,6 +302,31 @@ export default function NominasPage() {
         descripcion="Una vez confirmes, el estado del proceso será actualizado en los registros de información."
       />
 
+      {/* Modal anular — confirmación especial */}
+      <ConfirmarCambiosModal
+        visible={confirmarAnulado}
+        onCancelar={() => setConfirmarAnulado(false)}
+        onConfirmar={() => {
+          setPeriodos(periodos.map(p =>
+            p.id === cambioEstado.periodoId ? { ...p, estado: 'Anulado' } : p
+          ));
+          setConfirmarAnulado(false);
+          setModal('exito');
+        }}
+        titulo="¿Estás seguro de que deseas anular este proceso?"
+        descripcion="Esta acción es irreversible. Una vez anulado, el proceso no podrá volver a un estado activo. ¿Confirmas la anulación?"
+        tipo="error"
+      />
+
+      {/* Modal eliminar */}
+      <ConfirmarCambiosModal
+        visible={confirmarEliminar}
+        onCancelar={() => setConfirmarEliminar(false)}
+        onConfirmar={handleConfirmarEliminar}
+        titulo="¿Deseas eliminar este proceso de nómina?"
+        descripcion="Esta acción registrará la fecha de eliminación del proceso y dejará de mostrarse en la lista."
+      />
+
       {/* Modal éxito/error */}
       <MensajeModal tipo={modal} onClose={() => setModal(null)} />
 
@@ -253,37 +335,38 @@ export default function NominasPage() {
 }
 
 const styles = {
-  container:     { padding: '0', fontFamily: 'Nunito, sans-serif', display: 'flex', flexDirection: 'column', gap: '16px' },
-  header:        { display: 'flex', justifyContent: 'space-between', alignItems: 'center' },
-  titulo:        { fontSize: '18px', fontWeight: '800', color: '#272525', margin: 0 },
-  subtitulo:     { fontSize: '12px', color: '#A3A3A3', margin: 0 },
-  perfilBox:     { display: 'flex', alignItems: 'center', gap: '10px' },
-  avatar:        { width: '40px', height: '40px', borderRadius: '50%', backgroundColor: '#D0D0D0', color: '#272525', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: '700', fontSize: '16px', flexShrink: 0 },
-  perfilNombre:  { fontSize: '13px', fontWeight: '700', color: '#272525', margin: 0, lineHeight: 1.3 },
-  perfilCargo:   { fontSize: '11px', color: '#A3A3A3', fontWeight: '400', margin: 0 },
-  volverBtn:     { display: 'flex', alignItems: 'center', gap: '4px', background: 'none', border: 'none', cursor: 'pointer', fontSize: '14px', fontWeight: '600', color: '#272525', fontFamily: 'Nunito, sans-serif', padding: 0 },
-  totalNum:      { fontSize: '28px', fontWeight: '800', color: '#272525', margin: 0 },
-  totalLabel:    { fontSize: '12px', color: '#A3A3A3', margin: 0 },
-  addBar:        { display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#fff', borderRadius: '12px', padding: '16px 24px' },
-  addLabel:      { fontSize: '15px', fontWeight: '700', color: '#272525' },
-  btnLiquidar:   { color: '#fff', border: 'none', borderRadius: '8px', padding: '10px 28px', fontSize: '14px', fontWeight: '700', fontFamily: 'Nunito, sans-serif', cursor: 'pointer', textAlign: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center' },
-  tabsBox:       { display: 'flex', borderBottom: '1px solid #E8E8E8' },
-  tab:           { background: 'none', border: 'none', borderBottom: '2px solid transparent', padding: '10px 20px', fontSize: '14px', fontWeight: '600', color: '#A3A3A3', cursor: 'pointer', fontFamily: 'Nunito, sans-serif' },
-  tabActivo:     { color: '#0B662A', borderBottom: '2px solid #0B662A' },
-  card:          { backgroundColor: '#fff', borderRadius: '16px', padding: '24px' },
-  tableTitle:    { fontSize: '15px', fontWeight: '800', color: '#272525', margin: '0 0 16px 0' },
-  tableWrapper:  { overflowX: 'auto', width: '100%' },
-  table:         { width: '100%', borderCollapse: 'collapse', minWidth: '1000px' },
-  th:            { fontSize: '12px', fontWeight: '700', color: '#A3A3A3', padding: '10px 12px', textAlign: 'center', borderBottom: '1px solid #F0F0F0', whiteSpace: 'nowrap' },
-  td:            { fontSize: '13px', color: '#272525', padding: '12px 12px', textAlign: 'center', whiteSpace: 'nowrap' },
-  trPar:         { backgroundColor: '#fff' },
-  trImpar:       { backgroundColor: '#FAFAFA' },
-  paginacion:    { display: 'flex', justifyContent: 'center', gap: '6px', marginTop: '20px' },
-  pageBtn:       { width: '36px', height: '36px', borderRadius: '6px', border: '1px solid #D0D0D0', cursor: 'pointer', fontSize: '13px', fontWeight: '600', backgroundColor: '#fff', color: '#272525', fontFamily: 'Nunito, sans-serif' },
-  pageBtnActivo: { backgroundColor: '#0B662A', color: '#fff', border: '1px solid #0B662A' },
-  toolbarCard:   { backgroundColor: '#fff', borderRadius: '12px', padding: '16px 24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' },
-  filtrosBox:    { display: 'flex', alignItems: 'center', gap: '12px' },
-  searchBox:     { display: 'flex', alignItems: 'center', gap: '8px', border: '1px solid #0B662A', borderRadius: '8px', padding: '8px 14px', backgroundColor: '#fff', width: '380px' },
-  searchInput:   { border: 'none', outline: 'none', fontSize: '13px', width: '100%', fontFamily: 'Nunito, sans-serif' },
-  dateInput:     { border: '1px solid #0B662A', borderRadius: '8px', padding: '8px 12px', fontSize: '13px', fontFamily: 'Nunito, sans-serif', outline: 'none', cursor: 'pointer', color: '#272525' },
+  container:    { padding: '0', fontFamily: 'Nunito, sans-serif', display: 'flex', flexDirection: 'column', gap: '16px' },
+  header:       { display: 'flex', justifyContent: 'space-between', alignItems: 'center' },
+  titulo:       { fontSize: '18px', fontWeight: '800', color: '#272525', margin: 0 },
+  subtitulo:    { fontSize: '12px', color: '#A3A3A3', margin: 0 },
+  perfilBox:    { display: 'flex', alignItems: 'center', gap: '10px' },
+  avatar:       { width: '40px', height: '40px', borderRadius: '50%', backgroundColor: '#D0D0D0', color: '#272525', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: '700', fontSize: '16px', flexShrink: 0 },
+  perfilNombre: { fontSize: '13px', fontWeight: '700', color: '#272525', margin: 0, lineHeight: 1.3 },
+  perfilCargo:  { fontSize: '11px', color: '#A3A3A3', fontWeight: '400', margin: 0 },
+  volverBtn:    { display: 'flex', alignItems: 'center', gap: '4px', background: 'none', border: 'none', cursor: 'pointer', fontSize: '14px', fontWeight: '600', color: '#272525', fontFamily: 'Nunito, sans-serif', padding: 0 },
+  totalNum:     { fontSize: '28px', fontWeight: '800', color: '#272525', margin: 0 },
+  totalLabel:   { fontSize: '12px', color: '#A3A3A3', margin: 0 },
+  addBar:       { display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#fff', borderRadius: '12px', padding: '16px 24px' },
+  addLabel:     { fontSize: '15px', fontWeight: '700', color: '#272525' },
+  btnLiquidar:  { color: '#fff', border: 'none', borderRadius: '8px', padding: '10px 28px', fontSize: '14px', fontWeight: '700', fontFamily: 'Nunito, sans-serif', cursor: 'pointer', textAlign: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center' },
+  tabsBox:      { display: 'flex', borderBottom: '1px solid #E8E8E8' },
+  tab:          { background: 'none', border: 'none', borderBottom: '2px solid transparent', padding: '10px 20px', fontSize: '14px', fontWeight: '600', color: '#A3A3A3', cursor: 'pointer', fontFamily: 'Nunito, sans-serif' },
+  tabActivo:    { color: '#0B662A', borderBottom: '2px solid #0B662A' },
+  card:         { backgroundColor: '#fff', borderRadius: '16px', padding: '24px' },
+  tableTitle:   { fontSize: '15px', fontWeight: '800', color: '#272525', margin: '0 0 16px 0' },
+  tableWrapper: { overflowX: 'auto', width: '100%' },
+  table:        { width: '100%', borderCollapse: 'collapse', minWidth: '800px' },
+  th:           { fontSize: '12px', fontWeight: '700', color: '#A3A3A3', padding: '10px 12px', textAlign: 'center', borderBottom: '1px solid #F0F0F0', whiteSpace: 'nowrap' },
+  td:           { fontSize: '13px', color: '#272525', padding: '12px 12px', textAlign: 'center', whiteSpace: 'nowrap' },
+  trPar:        { backgroundColor: '#fff' },
+  trImpar:      { backgroundColor: '#FAFAFA' },
+  estadoTexto:  { fontSize: '12px', color: '#272525' },
+  paginacion:   { display: 'flex', justifyContent: 'center', gap: '6px', marginTop: '20px' },
+  pageBtn:      { width: '36px', height: '36px', borderRadius: '6px', border: '1px solid #D0D0D0', cursor: 'pointer', fontSize: '13px', fontWeight: '600', backgroundColor: '#fff', color: '#272525', fontFamily: 'Nunito, sans-serif' },
+  pageBtnActivo:{ backgroundColor: '#0B662A', color: '#fff', border: '1px solid #0B662A' },
+  toolbarCard:  { backgroundColor: '#fff', borderRadius: '12px', padding: '16px 24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' },
+  filtrosBox:   { display: 'flex', alignItems: 'center', gap: '12px' },
+  searchBox:    { display: 'flex', alignItems: 'center', gap: '8px', border: '1px solid #0B662A', borderRadius: '8px', padding: '8px 14px', backgroundColor: '#fff', width: '380px' },
+  searchInput:  { border: 'none', outline: 'none', fontSize: '13px', width: '100%', fontFamily: 'Nunito, sans-serif' },
+  iconBtn:      { background: 'none', border: 'none', cursor: 'pointer', padding: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '6px' },
 };

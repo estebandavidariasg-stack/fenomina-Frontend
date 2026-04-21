@@ -21,12 +21,28 @@ import CrearEmpleadoPage from '../features/auth/pages/empresas/empleados/CrearEm
 import VerEmpleadoPage from '../features/auth/pages/empresas/empleados/VerEmpleadoPage';
 import EditarEmpleadoPage from '../features/auth/pages/empresas/empleados/EditarEmpleadoPage';
 import NominasPage from '../features/auth/pages/empresas/nominas/NominasPage';
-import LiquidarNominasPage from '../features/auth/pages/empresas/nominas/LiquidarNominasPage';
-import ReporteLiquidacionPage from '../features/auth/pages/empresas/nominas/ReporteLiquidacionPage';
 import NovedadesPage from '../features/auth/pages/empresas/nominas/NovedadesPage';
-import GenerarReportePage from '../features/auth/pages/empresas/nominas/GenerarReportePage';
-import DesprendiblesPage from '../features/auth/pages/empresas/nominas/DesprendiblesPage';
+import DesprendiblesNominaPage from '../features/auth/pages/empresas/nominas/DesprendiblesNominaPage';
 import ParametrosGeneralesPage from '../features/auth/pages/parametros/ParametrosGeneralesPage';
+import LiquidarNominaPage from '../features/auth/pages/empresas/nominas/LiquidarNominaPage';
+import ResultadoLiquidacionPage from '../features/auth/pages/empresas/nominas/ResultadoLiquidacionPage';
+import GenerarReportePage from "../features/auth/pages/empresas/nominas/GenerarReportePage";
+
+import PrimasPage from "../features/auth/pages/empresas/primas/PrimasPage";
+import GenerarReportePrimasPage from "../features/auth/pages/empresas/primas/GenerarReportePrimasPage";
+import VerPrimaPage from "../features/auth/pages/empresas/primas/VerPrimaPage";
+import DesprendiblesPrimaPage from "../features/auth/pages/empresas/primas/DesprendiblesPrimaPage";
+import LiquidarPrimaPage from "../features/auth/pages/empresas/primas/LiquidarPrimaPage";
+import ResultadoPrimaPage from "../features/auth/pages/empresas/primas/ResultadoPrimaPage";
+
+
+import CesantiasPage from "../features/auth/pages/empresas/cesantias/CesantiasPage";
+import GenerarReporteCesantiasPage from "../features/auth/pages/empresas/cesantias/GenerarReporteCesantiasPage";
+import VerCesantiaPage from "../features/auth/pages/empresas/cesantias/VerCesantiaPage";
+import DesprendiblesCesantiasPage from "../features/auth/pages/empresas/cesantias/DesprendiblesCesantiasPage";
+import LiquidarCesantiasPage from "../features/auth/pages/empresas/cesantias/LiquidarCesantiasPage";
+import ResultadoCesantiasPage from "../features/auth/pages/empresas/cesantias/ResultadoCesantiasPage";
+
 
 
 function RutaRaiz() {
@@ -75,15 +91,34 @@ export default function AppRouter() {
 
             {/* Nóminas */}
             <Route path="/empresas/:id/nominas" element={<NominasPage />} />
-            <Route path="/empresas/:id/nominas/liquidar" element={<LiquidarNominasPage />} />
-            <Route path="/empresas/:id/nominas/reporte" element={<ReporteLiquidacionPage />} />
             <Route path="/empresas/:id/nominas/:nominaId/novedades" element={<NovedadesPage />} />
+            <Route path="/empresas/:id/nominas/:nominaId/desprendibles" element={<DesprendiblesNominaPage />} />
+            <Route path="/empresas/:id/nominas/:nominaId/liquidar" element={<LiquidarNominaPage />} />
+            <Route path="/empresas/:id/nominas/:nominaId/resultado" element={<ResultadoLiquidacionPage />} />
             <Route path="/empresas/:id/nominas/generar-reporte" element={<GenerarReportePage />} />
-            <Route path="/empresas/:id/nominas/desprendibles" element={<DesprendiblesPage />} />
+
+            {/* Primas */}
+            <Route path="/empresas/:id/primas" element={<PrimasPage />} />
+            <Route path="/empresas/:id/primas/generar-reporte" element={<GenerarReportePrimasPage />} />
+            <Route path="/empresas/:id/primas/ver-prima/:empleadoId" element={<VerPrimaPage />} />
+            <Route path="/empresas/:id/primas/:primaId/desprendibles" element={<DesprendiblesPrimaPage />} />
+            <Route path="/empresas/:id/primas/:primaId/liquidar" element={<LiquidarPrimaPage />} />
+            <Route path="/empresas/:id/primas/:primaId/resultado" element={<ResultadoPrimaPage />} />
+
+            {/* Cesantías */}
+            <Route path="/empresas/:id/cesantias" element={<CesantiasPage />} />
+            <Route path="/empresas/:id/cesantias/generar-reporte" element={<GenerarReporteCesantiasPage />} />
+            <Route path="/empresas/:id/cesantias/ver-cesantia/:empleadoId" element={<VerCesantiaPage />} />
+            <Route path="/empresas/:id/cesantias/:cesantiaId/desprendibles" element={<DesprendiblesCesantiasPage />} />
+            <Route path="/empresas/:id/cesantias/:cesantiaId/liquidar" element={<LiquidarCesantiasPage />} />
+            <Route path="/empresas/:id/cesantias/:cesantiaId/resultado" element={<ResultadoCesantiasPage />} />
+
+
 
             {/* Parámetros */}
             <Route path="/parametros" element={<ParametrosGeneralesPage />} />
 
+            
 
           </Route>
         </Route>

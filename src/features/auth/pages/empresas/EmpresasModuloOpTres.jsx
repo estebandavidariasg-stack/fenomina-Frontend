@@ -8,7 +8,7 @@ import {
 
 function Carpeta({ children }) {
   return (
-    <svg viewBox="0 0 160 130" width="220" height="185" xmlns="http://www.w3.org/2000/svg">
+    <svg viewBox="0 0 160 130" width="100%" height="auto" xmlns="http://www.w3.org/2000/svg">
       <path
         d="M0,18 Q0,12 6,12 L58,12 Q64,12 67,18 L72,24 L154,24 Q160,24 160,30 L160,124 Q160,130 154,130 L6,130 Q0,130 0,124 Z"
         fill="#DDE8DC"
@@ -88,8 +88,6 @@ export default function EmpresasModuloOpTres() {
                 key={modulo.id}
                 style={{
                   ...styles.moduloCard,
-                  ...(index === 3 ? { gridColumn: '1' } : {}),
-                  ...(index === 4 ? { gridColumn: '2' } : {}),
                 }}
                 onClick={() => navigate(`/empresas/${id}/${modulo.ruta}`)}
               >
@@ -116,8 +114,8 @@ const styles = {
   perfilCargo:  { fontSize: '11px', color: '#A3A3A3', fontWeight: '400', margin: 0 },
   volverBtn:    { display: 'flex', alignItems: 'center', gap: '4px', background: 'none', border: 'none', cursor: 'pointer', fontSize: '14px', fontWeight: '600', fontFamily: 'Nunito, sans-serif', marginTop: '4px', marginBottom: '16px', padding: 0, transition: 'color 0.2s' },
   areaContenido:{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' },
-  card:         { backgroundColor: '#fff', borderRadius: '16px', padding: '75px 56px', width: '100%' },
-  grid:         { display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '40px 0px', justifyItems: 'center' },
-  moduloCard:   { display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px', cursor: 'pointer' },
+  card:         { backgroundColor: '#fff', borderRadius: '16px', padding: '60px 40px', width: '100%', boxSizing: 'border-box' },
+  grid:         { display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '40px 32px' },
+  moduloCard:   { display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px', cursor: 'pointer', width: '100%', maxWidth: '220px', margin: '0 auto' },
   moduloLabel:  { fontSize: '15px', fontWeight: '600', color: '#272525', textAlign: 'center', margin: 0 },
 };
