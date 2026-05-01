@@ -41,7 +41,16 @@ import DesprendiblesCesantiasPage from "../features/auth/pages/empresas/cesantia
 import LiquidarCesantiasPage from "../features/auth/pages/empresas/cesantias/LiquidarCesantiasPage";
 import ResultadoCesantiasPage from "../features/auth/pages/empresas/cesantias/ResultadoCesantiasPage";
 
+import ReportesPage from "../features/auth/pages/empresas/reportes/ReportesPage";
+import ProvisionesPage from "../features/auth/pages/empresas/reportes/ProvisionesPage";
+import ReportesEmpleadosPage from "../features/auth/pages/empresas/reportes/empleados/ReportesEmpleadosPage";
+import ReportesNominasPage from "../features/auth/pages/empresas/reportes/empleados/ReportesNominasPage";
+import ReportesPrimasPage from "../features/auth/pages/empresas/reportes/empleados/ReportesPrimasPage";
+import ReportesCesantiasPage from "../features/auth/pages/empresas/reportes/empleados/ReportesCesantiasPage";
+import ReportesConceptosPage from "../features/auth/pages/empresas/reportes/empleados/ReportesConceptosPage";
+import ReportesRetencionPage from "../features/auth/pages/empresas/reportes/empleados/ReportesRetencionPage";
 
+import LogsPage from '../features/auth/pages/LogsPage';
 
 function RutaRaiz() {
   const { accessToken } = useAuthStore();
@@ -108,10 +117,22 @@ export default function AppRouter() {
 
 
 
+            {/* Reportes */}
+            <Route path="/empresas/:id/reportes" element={<ReportesPage />} />
+            <Route path="/empresas/:id/reportes/provisiones" element={<ProvisionesPage />} />
+            <Route path="/empresas/:id/reportes/empleados" element={<ReportesEmpleadosPage />} />
+            <Route path="/empresas/:id/reportes/empleados/nominas" element={<ReportesNominasPage />} />
+            <Route path="/empresas/:id/reportes/empleados/primas" element={<ReportesPrimasPage />} />
+            <Route path="/empresas/:id/reportes/empleados/cesantias" element={<ReportesCesantiasPage />} />
+            <Route path="/empresas/:id/reportes/empleados/conceptos" element={<ReportesConceptosPage />} />
+            <Route path="/empresas/:id/reportes/empleados/retencion" element={<ReportesRetencionPage />} />
+
             {/* Parámetros */}
             <Route path="/parametros" element={<ParametrosGeneralesPage />} />
 
-            
+            {/* Logs */}
+            <Route path="/logs" element={<LogsPage />} />
+
 
           </Route>
         </Route>
