@@ -4,6 +4,7 @@ import { useAuthStore } from '../../../../store/authStore';
 import { Settings2, ChevronDown, Plus, Trash2, UserRound } from 'lucide-react';
 import MensajeModal from '../../../../components/MensajeModal';
 import ConfirmarCambiosModal from '../../../../components/ConfirmarCambiosModal';
+import { formatearMiles, limpiarMiles } from '../../../../utils/formatters';
 
 // ─── Opciones por sección ───────────────────────────────────────────────────
 const OPCIONES = {
@@ -115,8 +116,9 @@ function FilaParametro({ fila, index, opciones, seccionKey, openDropdown, setOpe
           <input
             style={styles.input}
             placeholder="Ingresar valor"
-            value={fila.valor}
-            onChange={e => onChange(index, 'valor', e.target.value)}
+            inputMode="numeric"
+            value={formatearMiles(fila.valor)}
+            onChange={e => onChange(index, 'valor', limpiarMiles(e.target.value))}
           />
         </div>
       </div>
@@ -128,9 +130,11 @@ function FilaParametro({ fila, index, opciones, seccionKey, openDropdown, setOpe
           <input
             style={styles.input}
             placeholder="Ingresar número"
-            type="number"
+            type="text"
+            inputMode="decimal"
             value={fila.porcentaje}
             onChange={e => onChange(index, 'porcentaje', e.target.value)}
+            onKeyPress={e => { if (!/[\d.]/.test(e.key)) e.preventDefault(); }}
           />
         </div>
 
